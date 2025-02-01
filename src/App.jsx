@@ -37,12 +37,37 @@ const App = () => {
     f();
   }, []);
 
+  const handleMouseDrag = (moveEvent) => {
+    const deltaX = moveEvent.clientX - mouseStartCoords.current.x + panStartCoords.current.x;
+    const deltaY = moveEvent.clientY - mouseStartCoords.current.y + panStartCoords.current.y;
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+    const viewport = renderingEngine.getViewport(viewportId);
+    viewport.setPan([deltaX, deltaY]);
+    viewport.render();
+  };
+
+  const mouseStartCoords = useRef({ x: 0, y: 0 });
+  const panStartCoords = useRef({ x: 0, y: 0 });
+
   return (
     <div>
       <div
         id='cornerstone-element'
         ref={divRef}
         style={{ width: '512px', height: '512px', border: '1px solid black' }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          mouseStartCoords.current = { x: e.clientX, y: e.clientY };
+          const renderingEngine = getRenderingEngine(renderingEngineId);
+          const viewport = renderingEngine.getViewport(viewportId);
+          const pan = viewport.getPan();
+          panStartCoords.current = { x: pan[0], y: pan[1] };
+        }}
+        onMouseMove={(e) => {
+          if (e.buttons === 1) {
+            handleMouseDrag(e, mouseStartCoords.current.x, mouseStartCoords.current.y);
+          }
+        }}
       />
       <p>Choose a DICOM file: {file?.name ?? ''}</p>
       <input
@@ -74,10 +99,7 @@ const App = () => {
         }}
       />
       <button onClick={() => {
-        // Get the rendering engine
         const renderingEngine = getRenderingEngine(renderingEngineId);
-
-        // Get the stack viewport
         const viewport = renderingEngine.getViewport(
           viewportId
         );
@@ -92,10 +114,7 @@ const App = () => {
         reset zoom
       </button>
       <button onClick={() => {
-        // Get the rendering engine
         const renderingEngine = getRenderingEngine(renderingEngineId);
-
-        // Get the stack viewport
         const viewport = renderingEngine.getViewport(
           viewportId
         );
@@ -106,6 +125,18 @@ const App = () => {
         viewport.render();
       }}>
         zoom in
+      </button>
+      <button onClick={() => {
+        const renderingEngine = getRenderingEngine(renderingEngineId);
+
+        // Get the stack viewport
+        const viewport = renderingEngine.getViewport(
+          viewportId
+        );
+        viewport.resetCamera();
+        viewport.render();
+      }}>
+        reset
       </button>
     </div>
   );
