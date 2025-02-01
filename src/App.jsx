@@ -16,18 +16,11 @@ const viewportId = 'CT_STACK';
 
 const App = () => {
   const divRef = useRef(null);
-  const [file, setFile] = useState(null);
 
-  function readFileAsArrayBuffer(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result);
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
-    });
-  }
+  const getViewport = () => {
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+    return renderingEngine.getViewport(viewportId);
+  };
 
   useEffect(() => {
     const f = async () => {
@@ -37,12 +30,26 @@ const App = () => {
     f();
   }, []);
 
-  const handleMouseDrag = (moveEvent) => {
-    const deltaX = moveEvent.clientX - mouseStartCoords.current.x + panStartCoords.current.x;
-    const deltaY = moveEvent.clientY - mouseStartCoords.current.y + panStartCoords.current.y;
-    const renderingEngine = getRenderingEngine(renderingEngineId);
-    const viewport = renderingEngine.getViewport(viewportId);
+  const handleMouseDrag = (event) => {
+    const deltaX = event.clientX - mouseStartCoords.current.x + panStartCoords.current.x;
+    const deltaY = event.clientY - mouseStartCoords.current.y + panStartCoords.current.y;
+    const viewport = getViewport();
     viewport.setPan([deltaX, deltaY]);
+    viewport.render();
+  };
+
+  const handleWheelZoom = (event) => {
+    const viewport = getViewport();
+    const zoomFactor = 1.05; // Scale factor for zooming
+    let currentZoom = viewport.getZoom();
+
+    if (event.deltaY < 0) {
+      // Zoom in
+      viewport.setZoom(currentZoom * zoomFactor);
+    } else {
+      // Zoom out
+      viewport.setZoom(currentZoom / zoomFactor);
+    }
     viewport.render();
   };
 
@@ -58,8 +65,7 @@ const App = () => {
         onMouseDown={(e) => {
           e.preventDefault();
           mouseStartCoords.current = { x: e.clientX, y: e.clientY };
-          const renderingEngine = getRenderingEngine(renderingEngineId);
-          const viewport = renderingEngine.getViewport(viewportId);
+          const viewport = getViewport();
           const pan = viewport.getPan();
           panStartCoords.current = { x: pan[0], y: pan[1] };
         }}
@@ -68,8 +74,9 @@ const App = () => {
             handleMouseDrag(e, mouseStartCoords.current.x, mouseStartCoords.current.y);
           }
         }}
+        onWheel={handleWheelZoom}
       />
-      <p>Choose a DICOM file: {file?.name ?? ''}</p>
+      <p>Choose a DICOM file:</p>
       <input
         type="file"
         onChange={(e) => {
@@ -84,26 +91,18 @@ const App = () => {
               type: ViewportType.STACK,
               element: divRef.current,
               defaultOptions: {
-                background: [0.2, 0, 0.2],
+                background: [0.1, 0.1, 0.1],
               },
             };
 
             renderingEngine.enableElement(viewportInput);
-
-            // Get the stack viewport that was created
-            const viewport = renderingEngine.getViewport(
-              viewportId
-            );
+            const viewport = renderingEngine.getViewport(viewportId);
             viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])]);
           }
         }}
       />
       <button onClick={() => {
-        const renderingEngine = getRenderingEngine(renderingEngineId);
-        const viewport = renderingEngine.getViewport(
-          viewportId
-        );
-
+        const viewport = getViewport();
         viewport.resetCamera({
           resetZoom: true,
           resetPan: false,
@@ -114,25 +113,15 @@ const App = () => {
         reset zoom
       </button>
       <button onClick={() => {
-        const renderingEngine = getRenderingEngine(renderingEngineId);
-        const viewport = renderingEngine.getViewport(
-          viewportId
-        );
-
+        const viewport = getViewport();
         const zoom = viewport.getZoom();
-
         viewport.setZoom(zoom * 1.05);
         viewport.render();
       }}>
         zoom in
       </button>
       <button onClick={() => {
-        const renderingEngine = getRenderingEngine(renderingEngineId);
-
-        // Get the stack viewport
-        const viewport = renderingEngine.getViewport(
-          viewportId
-        );
+        const viewport = getViewport();
         viewport.resetCamera();
         viewport.render();
       }}>
