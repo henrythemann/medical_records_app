@@ -30,9 +30,9 @@ export default async function initDemo(config) {
   await csToolsInit();
 
   // for testings, you don't need any of these
-  volumeLoader.registerVolumeLoader('fakeVolumeLoader', fakeVolumeLoader);
-  imageLoader.registerImageLoader('fakeImageLoader', fakeImageLoader);
-  metaData.addProvider(fakeMetaDataProvider, 10000);
+  // volumeLoader.registerVolumeLoader('fakeVolumeLoader', fakeVolumeLoader);
+  // imageLoader.registerImageLoader('fakeImageLoader', fakeImageLoader);
+  // metaData.addProvider(fakeMetaDataProvider, 10000);
 }
 
 /**
