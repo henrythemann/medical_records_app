@@ -25,8 +25,6 @@ import setCtTransferFunctionForVolumeActor, {
 } from './setCtTransferFunctionForVolumeActor';
 import setPetColorMapTransferFunctionForVolumeActor from './setPetColorMapTransferFunctionForVolumeActor';
 import setPetTransferFunctionForVolumeActor from './setPetTransferFunctionForVolumeActor';
-import setTitleAndDescription from './setTitleAndDescription';
-import { wadoURICreateImageIds } from './WADOURICreateImageIds';
 import { createAndCacheGeometriesFromSurfaces } from './createAndCacheGeometriesFromSurfaces';
 import { createAndCacheGeometriesFromContours } from './createAndCacheGeometriesFromContours';
 
@@ -57,8 +55,6 @@ export {
   setCtTransferFunctionForVolumeActor,
   setPetColorMapTransferFunctionForVolumeActor,
   setPetTransferFunctionForVolumeActor,
-  setTitleAndDescription,
-  wadoURICreateImageIds,
   createAndCacheGeometriesFromContours,
   createAndCacheGeometriesFromSurfaces,
 };

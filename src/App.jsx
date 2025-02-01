@@ -23,9 +23,28 @@ const App = () => {
   };
 
   useEffect(() => {
+    const handleResize = () => {
+      const renderingEngine = getRenderingEngine(renderingEngineId);
+      renderingEngine.resize();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     const f = async () => {
       // Init Cornerstone and related libraries
       await initDemo();
+      const renderingEngine = new RenderingEngine(renderingEngineId);
+      const viewportInput = {
+        viewportId,
+        type: ViewportType.STACK,
+        element: divRef.current,
+        defaultOptions: {
+          background: [0.1, 0.1, 0.1],
+        },
+      };
+      renderingEngine.enableElement(viewportInput);
     }
     f();
   }, []);
@@ -61,7 +80,7 @@ const App = () => {
       <div
         id='cornerstone-element'
         ref={divRef}
-        style={{ width: '512px', height: '512px', border: '1px solid black' }}
+        style={{ width: '100vw', height: '80vh', border: '1px solid black' }}
         onMouseDown={(e) => {
           e.preventDefault();
           mouseStartCoords.current = { x: e.clientX, y: e.clientY };
@@ -81,22 +100,8 @@ const App = () => {
         type="file"
         onChange={(e) => {
           if (e.target.files?.length > 0) {
-            console.log('file:', e);
-            // setFile(e.target.files[0]);
-            const renderingEngine = new RenderingEngine(renderingEngineId);
-
-            // Create a stack viewport
-            const viewportInput = {
-              viewportId,
-              type: ViewportType.STACK,
-              element: divRef.current,
-              defaultOptions: {
-                background: [0.1, 0.1, 0.1],
-              },
-            };
-
-            renderingEngine.enableElement(viewportInput);
-            const viewport = renderingEngine.getViewport(viewportId);
+            const viewport = getViewport();
+            viewport.resetCamera();
             viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])]);
           }
         }}
