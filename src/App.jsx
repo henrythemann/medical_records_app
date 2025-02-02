@@ -17,6 +17,12 @@ const viewportId = 'CT_STACK';
 const App = () => {
   const divRef = useRef(null);
 
+  const [fullScreen, setFullScreen_] = useState(false);
+  const setFullScreen = (bool) => {
+    bool ? window.electronAPI.setFullScreen() : window.electronAPI.exitFullScreen();
+    setFullScreen_(bool);
+  };
+
   const getViewport = () => {
     const renderingEngine = getRenderingEngine(renderingEngineId);
     return renderingEngine.getViewport(viewportId);
@@ -29,7 +35,7 @@ const App = () => {
     };
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        window.electronAPI.exitFullScreen();
+        setFullScreen(false);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -39,6 +45,20 @@ const App = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  function dataURItoBlob(dataURI) {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return { buffer: ab, type: mimeString };
+  }
 
   useEffect(() => {
     const f = async () => {
@@ -54,9 +74,29 @@ const App = () => {
         },
       };
       renderingEngine.enableElement(viewportInput);
+      const viewport = renderingEngine.getViewport(viewportId);
+      viewport.setStack(['wadouri:/Users/waddledee72/a.dcm']);
+      document.getElementById('cornerstone-element').addEventListener('CORNERSTONE_IMAGE_RENDERED', async (event) => {
+        if (event.detail.viewportId === viewportId) {
+            console.log('Image fully rendered, saving now...');
+            await saveImageFile();
+        }
+    });
     }
     f();
   }, []);
+
+  const saveImageFile = async () => {
+    const viewport = getViewport();
+    const canvas = viewport.getCanvas();
+    const imageData = viewport.getImageData();
+    console.log(imageData);
+    // const imageWidth = imageData.width;
+    // const imageHeight = imageData.height;
+    const { buffer, type } = dataURItoBlob(canvas.toDataURL());
+    const result = await window.electronAPI.saveFile('test.png', buffer);
+    console.log(result);
+  };
 
   const handleMouseDrag = (event) => {
     const deltaX = event.clientX - mouseStartCoords.current.x + panStartCoords.current.x;
@@ -114,19 +154,21 @@ const App = () => {
           top: '0.5rem',
           right: '0.5rem',
           zIndex: 10,
-          }}
-          >
+        }}
+        >
           <button
-            className={styles.viewportButton} 
-            onClick={ window.electronAPI.setFullScreen }
+            className={styles.viewportButton}
+            onClick={() => fullScreen ? setFullScreen(false) : setFullScreen(true)}
           >
             <svg
-            viewBox="0 0 24 24"
-            width="2rem"
-            height="2rem"
-            fill="#ddd"
+              viewBox="0 0 24 24"
+              width="2rem"
+              height="2rem"
             >
-            <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3z"></path>
+              {fullScreen ?
+                <path d="M16.79 5.8 14 3h7v7l-2.79-2.8-4.09 4.09-1.41-1.41zM19 12v4.17l2 2V12zm.78 10.61L18.17 21H5c-1.11 0-2-.9-2-2V5.83L1.39 4.22 2.8 2.81l18.38 18.38zM16.17 19l-4.88-4.88-1.59 1.59-1.41-1.41 1.59-1.59L5 7.83V19zM7.83 5H12V3H5.83z"></path> :
+                <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3z"></path>
+              }
             </svg>
           </button>
         </div>
@@ -148,6 +190,11 @@ const App = () => {
         viewport.render();
       }}>
         reset view
+      </button>
+      <button onClick={async () => {
+        saveImageFile();
+      }}>
+        save file
       </button>
     </div>
   );
