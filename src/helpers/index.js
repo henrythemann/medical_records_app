@@ -15,7 +15,6 @@ import contourSegmentationToolBindings from './contourSegmentationToolBindings';
 import contourTools from './contourTools';
 import createElement from './createElement';
 import createImageIdsAndCacheMetaData from './createImageIdsAndCacheMetaData';
-import createInfoSection from './createInfoSection';
 import downloadSurfacesData from './downloadSurfacesData';
 import getLocalUrl from './getLocalUrl';
 import initDemo from './initDemo';
@@ -46,7 +45,6 @@ export {
   contourTools,
   createElement,
   createImageIdsAndCacheMetaData,
-  createInfoSection,
   ctVoiRange,
   downloadSurfacesData,
   getLocalUrl,
