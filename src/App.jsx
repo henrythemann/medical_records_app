@@ -78,25 +78,74 @@ const App = () => {
       viewport.setStack(['wadouri:/Users/waddledee72/a.dcm']);
       document.getElementById('cornerstone-element').addEventListener('CORNERSTONE_IMAGE_RENDERED', async (event) => {
         if (event.detail.viewportId === viewportId) {
-            console.log('Image fully rendered, saving now...');
-            await saveImageFile();
+          console.log('Image fully rendered, saving now...');
+          await saveImageFile();
         }
-    });
+      });
     }
     f();
   }, []);
 
   const saveImageFile = async () => {
     const viewport = getViewport();
-    const canvas = viewport.getCanvas();
-    const imageData = viewport.getImageData();
-    console.log(imageData);
-    // const imageWidth = imageData.width;
-    // const imageHeight = imageData.height;
-    const { buffer, type } = dataURItoBlob(canvas.toDataURL());
-    const result = await window.electronAPI.saveFile('test.png', buffer);
+    // This is a vtkImageData
+    const vtkImage = viewport.getImageData();
+    console.log(vtkImage);
+
+    // 1. Extract dimensions and pixel data
+    const [width, height] = vtkImage.dimensions;
+    const scalarData = vtkImage.scalarData;
+
+    // 2. Create a new offscreen canvas at exactly the image size
+    const offscreen = document.createElement('canvas');
+    offscreen.width = width;
+    offscreen.height = height;
+    const ctx = offscreen.getContext('2d');
+
+    // 3. Convert the raw pixel data into RGBA for the canvas
+    //    (Assume grayscale for demonstration; for color images, 
+    //     you’d map pixelData differently.)
+    const imageData = ctx.createImageData(width, height);
+
+    let minVal = Infinity;
+    let maxVal = -Infinity;
+    for (let i = 0; i < scalarData.length; i++) {
+      const v = scalarData[i];
+      if (v < minVal) {
+        minVal = v;
+      }
+      if (v > maxVal) {
+        maxVal = v;
+      }
+    }
+    const range = maxVal - minVal || 1;
+
+    // 4. Loop over every pixel, scale to [0..255]
+    for (let i = 0; i < width * height; i++) {
+      // Read the raw 16-bit intensity
+      const value16 = scalarData[i];
+
+      // Scale from [minVal..maxVal] to [0..255]
+      const gray = ((value16 - minVal) / range) * 255;
+
+      // Write into the Canvas ImageData (RGB + alpha)
+      const idx = i * 4;
+      imageData.data[idx + 0] = gray;    // R
+      imageData.data[idx + 1] = gray;    // G
+      imageData.data[idx + 2] = gray;    // B
+      imageData.data[idx + 3] = 0xff;    // alpha = fully opaque
+    }
+    ctx.putImageData(imageData, 0, 0);
+
+    // 4. Export just that “pure” image region (no extra canvas space)
+    const dataUrl = offscreen.toDataURL();
+
+    // 5. Convert dataURL -> buffer and send to Electron
+    // const buffer = dataURItoBlob(dataUrl);
+    const result = await window.electronAPI.saveFile('test.png', dataUrl);
     console.log(result);
-  };
+  }
+
 
   const handleMouseDrag = (event) => {
     const deltaX = event.clientX - mouseStartCoords.current.x + panStartCoords.current.x;

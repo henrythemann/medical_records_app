@@ -34,11 +34,12 @@ ipcMain.on('exit-full-screen', (event) => {
   win.setFullScreen(false);
 });
 
-ipcMain.handle('save-file',async (event, { filename, content }) => {
+ipcMain.handle('save-viewport-image',async (event, { filename, content }) => {
   try {
-    const dataBuffer = Buffer.from(content);
+    const base64 = content.split(',')[1];
+    const dataBuffer = Buffer.from(base64, 'base64');
     const filePath = path.join(app.getPath('downloads'), filename);
-    fs.writeFileSync(filePath, dataBuffer, 'utf8');
+    fs.writeFileSync(filePath, dataBuffer);
     return { success: true, path: filePath };
   } catch (error) {
     return { success: false, error: error.message };
