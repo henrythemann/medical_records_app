@@ -27,8 +27,17 @@ const App = () => {
       const renderingEngine = getRenderingEngine(renderingEngineId);
       renderingEngine.resize();
     };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        window.electronAPI.exitFullScreen();
+      }
+    };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   useEffect(() => {
@@ -80,7 +89,12 @@ const App = () => {
       <div
         id='cornerstone-element'
         ref={divRef}
-        style={{ width: '100vw', height: '80vh', border: '1px solid black' }}
+        style={{
+          width: 'calc(100vw - 2px)',
+          height: '80vh',
+          border: '1px solid black',
+          position: 'relative',
+        }}
         onMouseDown={(e) => {
           e.preventDefault();
           mouseStartCoords.current = { x: e.clientX, y: e.clientY };
@@ -94,7 +108,29 @@ const App = () => {
           }
         }}
         onWheel={handleWheelZoom}
-      />
+      >
+        <div id='viewport-buttons' style={{
+          position: 'absolute',
+          top: '0.5rem',
+          right: '0.5rem',
+          zIndex: 10,
+          }}
+          >
+          <button
+            className={styles.viewportButton} 
+            onClick={ window.electronAPI.setFullScreen }
+          >
+            <svg
+            viewBox="0 0 24 24"
+            width="2rem"
+            height="2rem"
+            fill="#ddd"
+            >
+            <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
       <p>Choose a DICOM file:</p>
       <input
         type="file"
@@ -108,29 +144,10 @@ const App = () => {
       />
       <button onClick={() => {
         const viewport = getViewport();
-        viewport.resetCamera({
-          resetZoom: true,
-          resetPan: false,
-          resetToCenter: false,
-        });
-        viewport.render();
-      }}>
-        reset zoom
-      </button>
-      <button onClick={() => {
-        const viewport = getViewport();
-        const zoom = viewport.getZoom();
-        viewport.setZoom(zoom * 1.05);
-        viewport.render();
-      }}>
-        zoom in
-      </button>
-      <button onClick={() => {
-        const viewport = getViewport();
         viewport.resetCamera();
         viewport.render();
       }}>
-        reset
+        reset view
       </button>
     </div>
   );

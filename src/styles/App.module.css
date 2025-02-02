@@ -1,0 +1,11 @@
+.viewportButton {
+  cursor: pointer;
+  border: none;
+  border-radius: 0.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #99999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

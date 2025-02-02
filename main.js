@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 require('electron-reload')(__dirname);
 const path = require('path');
 
@@ -10,8 +10,8 @@ app.on('ready', () => {
     height: 1000,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), // Optional, if you use preload scripts
-      nodeIntegration: true, // Enable Node.js in your renderer
-      contextIsolation: false, // For React development
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
   // disable dev tools
@@ -21,6 +21,16 @@ app.on('ready', () => {
   mainWindow.webContents.openDevTools();
   // Load your React app
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+});
+
+ipcMain.on('set-full-screen', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  win.setFullScreen(true);
+});
+
+ipcMain.on('exit-full-screen', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  win.setFullScreen(false);
 });
 
 app.on('window-all-closed', () => {

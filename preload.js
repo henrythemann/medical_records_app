@@ -1,4 +1,6 @@
-// Expose a simple API to the renderer process if needed
-window.myAPI = {
-  sendMessage: (msg) => console.log(`Message from renderer: ${msg}`),
-};
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  setFullScreen: () => ipcRenderer.send('set-full-screen'),
+  exitFullScreen: () => ipcRenderer.send('exit-full-screen')
+});
