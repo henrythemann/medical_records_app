@@ -10,6 +10,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.module\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true
+            }
+          }
+        ]
+      },
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
@@ -19,9 +31,14 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx'], // Resolve both JS and JSX
+    extensions: ['.js', '.jsx', '.module.css'],
     alias: {
       '@': path.resolve(__dirname, 'src'), // Alias '@' to 'src' directory
+    },
+    fallback: {
+      fs: false, // completely stub out 'fs'
+      path: require.resolve('path-browserify'),
+      '@icr/polyseg-wasm': false,
     },
   },
   devServer: {

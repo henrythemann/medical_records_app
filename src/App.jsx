@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import React, { useEffect, useRef, useState } from 'react';
-import styles from '@/styles/App.module.css';
+import * as styles from './styles/App.module.css';
 import {
   getRenderingEngine,
   RenderingEngine,

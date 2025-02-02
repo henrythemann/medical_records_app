@@ -4,8 +4,11 @@
     "@babel/preset-react": "^7.26.3",
     "babel-loader": "^9.2.1",
     "concurrently": "^9.1.2",
+    "css-loader": "^7.1.2",
     "electron": "^34.0.1",
     "electron-reload": "^2.0.0-alpha.1",
+    "path-browserify": "^1.0.1",
+    "style-loader": "^4.0.0",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.0"
@@ -25,7 +28,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron .",
+    "build-renderer": "webpack --config webpack.config.js",
+    "start": "npm run build-renderer && electron .",
     "build": "webpack",
     "watch": "webpack --watch",
     "dev": "concurrently \"npm:watch\" \"npm:start\"",
