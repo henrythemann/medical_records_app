@@ -10,13 +10,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.module\.css$/,
+        test: /\.module\.[s]{0,1}css$/,
         use: [
           'style-loader',
           {
             loader: 'css-loader',
             options: {
-              modules: true
+              modules: true,
             }
           }
         ]
@@ -31,7 +31,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.module.css'],
+    extensions: ['.js', '.jsx', '.module.css', '.module.scss'],
     alias: {
       '@': path.resolve(__dirname, 'src'), // Alias '@' to 'src' directory
     },

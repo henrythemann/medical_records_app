@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import React, { useEffect, useRef, useState } from 'react';
-import * as styles from './styles/App.module.css';
+import * as styles from './styles/App.module.scss';
 import {
   getRenderingEngine,
   RenderingEngine,
@@ -17,6 +17,7 @@ const viewportId = 'CT_STACK';
 const App = () => {
   const divRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [menuX, setMenuX] = useState(false);
 
   const [fullScreen, setFullScreen_] = useState(false);
   const setFullScreen = (bool) => {
@@ -145,7 +146,7 @@ const App = () => {
       // 5. Convert dataURL -> buffer and send to Electron
       // const buffer = dataURItoBlob(dataUrl);
       const result = await window.electronAPI.saveViewportImage({ filePath, content: dataUrl });
-      if (!result?.success) 
+      if (!result?.success)
         console.error('Error saving image:', result.error);
 
       // cleanup
@@ -183,7 +184,7 @@ const App = () => {
   const panStartCoords = useRef({ x: 0, y: 0 });
 
   return (
-    <div>
+    <div className={styles.noOverflow}>
       <div
         id='cornerstone-element'
         ref={divRef}
@@ -214,26 +215,69 @@ const App = () => {
           zIndex: 10,
         }}
         >
+        <div style={{
+          position: 'relative',
+        }}
+        >
           <button
-            className={styles.viewportButton}
-            onClick={() => fullScreen ? setFullScreen(false) : setFullScreen(true)}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
+            className={[styles.viewportButton, showTooltip ? styles.menuX : ''].join(' ')}
+            onClick={() => {
+              setShowTooltip(!showTooltip)
+              setMenuX(!menuX)
+            }}
           >
-            <svg
-              viewBox="0 0 24 24"
-              width="2rem"
-              height="2rem"
-            >
-              {fullScreen ?
-                <path d="M16.79 5.8 14 3h7v7l-2.79-2.8-4.09 4.09-1.41-1.41zM19 12v4.17l2 2V12zm.78 10.61L18.17 21H5c-1.11 0-2-.9-2-2V5.83L1.39 4.22 2.8 2.81l18.38 18.38zM16.17 19l-4.88-4.88-1.59 1.59-1.41-1.41 1.59-1.59L5 7.83V19zM7.83 5H12V3H5.83z"></path> :
-                <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3z"></path>
-              }
-            </svg>
+            <div className={styles.hamburger} >
+              <div className={styles.bar} />
+              <div className={styles.bar} />
+              <div className={styles.bar} />
+            </div>
           </button>
+        <div className={styles.tooltip} style={showTooltip ? { opacity: '80%' } : { pointerEvents: 'none' }}>
+          <ul>
+            <li>
+              <button onClick={() => {
+                fullScreen ? setFullScreen(false) : setFullScreen(true)
+                setShowTooltip(false);
+              }}>
+              fullscreen
+              </button>
+              </li>
+            <li>
+              <button onClick={() => {
+                const viewport = getViewport();
+                viewport.resetCamera();
+                viewport.render();
+                setShowTooltip(false);
+              }}>
+                reset view
+              </button>
+            </li>
+            <li>
+              <button onClick={async () => {
+                const filePath = await window.electronAPI.openSaveDialog({
+                  defaultPath: 'image.png',
+                  filters: [{ name: 'PNG Image', extensions: ['png'] }],
+                });
+
+                if (!filePath) return;
+
+                saveViewportImage({ filePath });
+                setShowTooltip(false);
+              }}>
+                save image
+              </button>
+            </li>
+            <li>
+              <button onClick={() => {
+                setShowTooltip(false);
+              }}
+              >
+                import images...
+              </button>
+            </li>
+          </ul>
         </div>
-        <div className={styles.tooltip} style={showTooltip ? { opacity: '80%' } : undefined}>
-          {fullScreen ? 'Exit Full Screen' : 'Full Screen'}
+        </div>
         </div>
       </div>
       {!fullScreen && (
@@ -249,25 +293,6 @@ const App = () => {
               }
             }}
           />
-          <button onClick={() => {
-            const viewport = getViewport();
-            viewport.resetCamera();
-            viewport.render();
-          }}>
-            reset view
-          </button>
-          <button onClick={async () => {
-            const filePath = await window.electronAPI.openSaveDialog({
-              defaultPath: 'image.png',
-              filters: [{ name: 'PNG Image', extensions: ['png'] }],
-            });
-
-            if (!filePath) return;
-
-            saveViewportImage({ filePath });
-          }}>
-            save image
-          </button>
         </>
       )}
     </div>

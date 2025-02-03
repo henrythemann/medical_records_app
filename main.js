@@ -1,5 +1,8 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
-require('electron-reload')(__dirname);
+const { app, BrowserWindow, dialog, ipcMain, globalShortcut } = require('electron');
+const DEBUG = process.env.DEBUG == 'true';
+console.log('DEBUG:', DEBUG);
+if (DEBUG)
+  require('electron-reload')(__dirname);
 const path = require('path');
 const fs = require('fs');
 
@@ -16,11 +19,13 @@ app.on('ready', () => {
     },
   });
   // disable dev tools
-  // globalShortcut.register('Control+Shift+I', () => {
-  //   return false;
-  // });
-  mainWindow.webContents.openDevTools();
-  // Load your React app
+  if (!DEBUG) {
+    globalShortcut.register('Meta+Shift+I', () => {
+      return false;
+    });
+  } else {
+    mainWindow.webContents.openDevTools();
+  }
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 });
 
