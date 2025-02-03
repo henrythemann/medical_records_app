@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 require('electron-reload')(__dirname);
 const path = require('path');
 const fs = require('fs');
@@ -34,16 +34,29 @@ ipcMain.on('exit-full-screen', (event) => {
   win.setFullScreen(false);
 });
 
-ipcMain.handle('save-viewport-image',async (event, { filename, content }) => {
+ipcMain.handle('save-viewport-image', async (event, { filePath, content }) => {
   try {
     const base64 = content.split(',')[1];
     const dataBuffer = Buffer.from(base64, 'base64');
-    const filePath = path.join(app.getPath('downloads'), filename);
     fs.writeFileSync(filePath, dataBuffer);
-    return { success: true, path: filePath };
+    return { success: true, filePath };
   } catch (error) {
     return { success: false, error: error.message };
   }
+});
+
+ipcMain.handle('open-save-dialog', async (event, { defaultPath, filters }) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: 'Save File As',
+    defaultPath: defaultPath || 'untitled.png',
+    filters: filters || [{ name: 'PNG Image', extensions: ['png'] }],
+  });
+
+  if (result.canceled) {
+    return null; // User canceled the dialog
+  }
+
+  return result.filePath; // Return the selected file path
 });
 
 app.on('window-all-closed', () => {

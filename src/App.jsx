@@ -16,6 +16,7 @@ const viewportId = 'CT_STACK';
 
 const App = () => {
   const divRef = useRef(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const [fullScreen, setFullScreen_] = useState(false);
   const setFullScreen = (bool) => {
@@ -36,6 +37,15 @@ const App = () => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setFullScreen(false);
+      } else if (e.metaKey && (e.key === '=' || e.key === '-')) {
+        e.preventDefault();
+        const viewport = getViewport();
+        let currentZoom = viewport.getZoom();
+        if (e.key === '=')
+          viewport.setZoom(currentZoom * 1.1);
+        else
+          viewport.setZoom(currentZoom / 1.1);
+        viewport.render();
       }
     };
     window.addEventListener('resize', handleResize);
@@ -45,20 +55,13 @@ const App = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  function dataURItoBlob(dataURI) {
-    const byteString = atob(dataURI.split(',')[1]);
-    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
+  const saverHelper = async (event) => {
+    if (event.detail.viewportId === viewportId) {
+      await saveViewportImage({ filePath: '/Users/waddledee72/Downloads/test.png' });
     }
+    divRef.current.removeEventListener('CORNERSTONE_IMAGE_RENDERED', saverHelper);
+  };
 
-    return { buffer: ab, type: mimeString };
-  }
 
   useEffect(() => {
     const f = async () => {
@@ -76,76 +79,82 @@ const App = () => {
       renderingEngine.enableElement(viewportInput);
       const viewport = renderingEngine.getViewport(viewportId);
       viewport.setStack(['wadouri:/Users/waddledee72/a.dcm']);
-      document.getElementById('cornerstone-element').addEventListener('CORNERSTONE_IMAGE_RENDERED', async (event) => {
-        if (event.detail.viewportId === viewportId) {
-          console.log('Image fully rendered, saving now...');
-          await saveImageFile();
-        }
-      });
+      divRef.current.addEventListener('CORNERSTONE_IMAGE_RENDERED', saverHelper);
     }
     f();
   }, []);
 
-  const saveImageFile = async () => {
-    const viewport = getViewport();
-    // This is a vtkImageData
-    const vtkImage = viewport.getImageData();
-    console.log(vtkImage);
+  const saveViewportImage = async ({ filePath }) => {
+    try {
+      const viewport = getViewport();
+      // This is a vtkImageData
+      const vtkImage = viewport.getImageData();
 
-    // 1. Extract dimensions and pixel data
-    const [width, height] = vtkImage.dimensions;
-    const scalarData = vtkImage.scalarData;
-
-    // 2. Create a new offscreen canvas at exactly the image size
-    const offscreen = document.createElement('canvas');
-    offscreen.width = width;
-    offscreen.height = height;
-    const ctx = offscreen.getContext('2d');
-
-    // 3. Convert the raw pixel data into RGBA for the canvas
-    //    (Assume grayscale for demonstration; for color images, 
-    //     you’d map pixelData differently.)
-    const imageData = ctx.createImageData(width, height);
-
-    let minVal = Infinity;
-    let maxVal = -Infinity;
-    for (let i = 0; i < scalarData.length; i++) {
-      const v = scalarData[i];
-      if (v < minVal) {
-        minVal = v;
+      if (!vtkImage || !vtkImage.dimensions || !vtkImage.scalarData) {
+        console.error('No image data found');
+        return;
       }
-      if (v > maxVal) {
-        maxVal = v;
+      // 1. Extract dimensions and pixel data
+      const [width, height] = vtkImage.dimensions;
+      const scalarData = vtkImage.scalarData;
+
+      // 2. Create a new offscreen canvas at exactly the image size
+      let offscreen = document.createElement('canvas');
+      offscreen.width = width;
+      offscreen.height = height;
+      const ctx = offscreen.getContext('2d');
+
+      // 3. Convert the raw pixel data into RGBA for the canvas
+      //    (Assume grayscale for demonstration; for color images, 
+      //     you’d map pixelData differently.)
+      const imageData = ctx.createImageData(width, height);
+
+      let minVal = Infinity;
+      let maxVal = -Infinity;
+      for (let i = 0; i < scalarData.length; i++) {
+        const v = scalarData[i];
+        if (v < minVal) {
+          minVal = v;
+        }
+        if (v > maxVal) {
+          maxVal = v;
+        }
       }
+      const range = maxVal - minVal || 1;
+
+      // 4. Loop over every pixel, scale to [0..255]
+      for (let i = 0; i < width * height; i++) {
+        // Read the raw 16-bit intensity
+        const value16 = scalarData[i];
+
+        // Scale from [minVal..maxVal] to [0..255]
+        const gray = 255 - ((value16 - minVal) / range) * 255;
+
+        // Write into the Canvas ImageData (RGB + alpha)
+        const idx = i * 4;
+        imageData.data[idx + 0] = gray;    // R
+        imageData.data[idx + 1] = gray;    // G
+        imageData.data[idx + 2] = gray;    // B
+        imageData.data[idx + 3] = 0xff;    // alpha = fully opaque
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      // 4. Export just that “pure” image region (no extra canvas space)
+      const dataUrl = offscreen.toDataURL();
+
+      // 5. Convert dataURL -> buffer and send to Electron
+      // const buffer = dataURItoBlob(dataUrl);
+      const result = await window.electronAPI.saveViewportImage({ filePath, content: dataUrl });
+      if (!result?.success) 
+        console.error('Error saving image:', result.error);
+
+      // cleanup
+      URL.revokeObjectURL(dataUrl);
+      offscreen = null;
+    } catch (error) {
+      console.error('Error saving image:', error);
     }
-    const range = maxVal - minVal || 1;
-
-    // 4. Loop over every pixel, scale to [0..255]
-    for (let i = 0; i < width * height; i++) {
-      // Read the raw 16-bit intensity
-      const value16 = scalarData[i];
-
-      // Scale from [minVal..maxVal] to [0..255]
-      const gray = ((value16 - minVal) / range) * 255;
-
-      // Write into the Canvas ImageData (RGB + alpha)
-      const idx = i * 4;
-      imageData.data[idx + 0] = gray;    // R
-      imageData.data[idx + 1] = gray;    // G
-      imageData.data[idx + 2] = gray;    // B
-      imageData.data[idx + 3] = 0xff;    // alpha = fully opaque
-    }
-    ctx.putImageData(imageData, 0, 0);
-
-    // 4. Export just that “pure” image region (no extra canvas space)
-    const dataUrl = offscreen.toDataURL();
-
-    // 5. Convert dataURL -> buffer and send to Electron
-    // const buffer = dataURItoBlob(dataUrl);
-    const result = await window.electronAPI.saveFile('test.png', dataUrl);
-    console.log(result);
   }
-
 
   const handleMouseDrag = (event) => {
     const deltaX = event.clientX - mouseStartCoords.current.x + panStartCoords.current.x;
@@ -180,7 +189,7 @@ const App = () => {
         ref={divRef}
         style={{
           width: 'calc(100vw - 2px)',
-          height: '80vh',
+          height: fullScreen ? 'calc(100vh - 2px)' : '80vh',
           border: '1px solid black',
           position: 'relative',
         }}
@@ -208,6 +217,8 @@ const App = () => {
           <button
             className={styles.viewportButton}
             onClick={() => fullScreen ? setFullScreen(false) : setFullScreen(true)}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
           >
             <svg
               viewBox="0 0 24 24"
@@ -221,30 +232,44 @@ const App = () => {
             </svg>
           </button>
         </div>
+        <div className={styles.tooltip} style={showTooltip ? { opacity: '80%' } : undefined}>
+          {fullScreen ? 'Exit Full Screen' : 'Full Screen'}
+        </div>
       </div>
-      <p>Choose a DICOM file:</p>
-      <input
-        type="file"
-        onChange={(e) => {
-          if (e.target.files?.length > 0) {
+      {!fullScreen && (
+        <>
+          <p>Choose a DICOM file:</p>
+          <input
+            type="file"
+            onChange={(e) => {
+              if (e.target.files?.length > 0) {
+                const viewport = getViewport();
+                viewport.resetCamera();
+                viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])]);
+              }
+            }}
+          />
+          <button onClick={() => {
             const viewport = getViewport();
             viewport.resetCamera();
-            viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])]);
-          }
-        }}
-      />
-      <button onClick={() => {
-        const viewport = getViewport();
-        viewport.resetCamera();
-        viewport.render();
-      }}>
-        reset view
-      </button>
-      <button onClick={async () => {
-        saveImageFile();
-      }}>
-        save file
-      </button>
+            viewport.render();
+          }}>
+            reset view
+          </button>
+          <button onClick={async () => {
+            const filePath = await window.electronAPI.openSaveDialog({
+              defaultPath: 'image.png',
+              filters: [{ name: 'PNG Image', extensions: ['png'] }],
+            });
+
+            if (!filePath) return;
+
+            saveViewportImage({ filePath });
+          }}>
+            save image
+          </button>
+        </>
+      )}
     </div>
   );
 };
