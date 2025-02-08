@@ -5,6 +5,7 @@ if (DEBUG)
   require('electron-reload')(__dirname);
 const path = require('path');
 const fs = require('fs');
+const dicomParser = require('dicom-parser');
 
 let mainWindow;
 
@@ -106,31 +107,42 @@ const getAllFiles = (dirPath) => {
 
 const checkDicomFile = (filePath) => {
   return new Promise((resolve, reject) => {
-    const offset = 128;
-    const length = 4;
-    const buffer = Buffer.alloc(length);
+    fs.readFile(filePath, (err, data) => {
+      if (err) return resolve({ filePath, isDicom: false, isInverted: null });
 
-    fs.open(filePath, 'r', (err, fd) => {
-      if (err) return resolve(false); // Skip file if it can't be opened
+      // Check for DICOM prefix
+      if (data.toString('utf8', 128, 132) !== 'DICM') {
+        return resolve({ filePath, isDicom: false, isInverted: null });
+      }
 
-      fs.read(fd, buffer, 0, length, offset, (err, bytesRead) => {
-        fs.close(fd, () => {
-          if (err) return resolve(false);
-          resolve(buffer.toString('utf8') === 'DICM');
-        });
-      });
+      try {
+        // Convert Node.js Buffer to Uint8Array
+        const dicomDataSet = dicomParser.parseDicom(new Uint8Array(data));
+        const photometricInterpretation = dicomDataSet.string('x00280004');
+
+        if (!photometricInterpretation) {
+          return resolve({ filePath, isDicom: true, isInverted: null });
+        }
+
+        const isInverted = photometricInterpretation === 'MONOCHROME1';
+        resolve({ filePath, isDicom: true, isInverted });
+      } catch (e) {
+        console.error('Error parsing DICOM:', e);
+        resolve({ filePath, isDicom: false, isInverted: null });
+      }
     });
   });
 };
+
 
 ipcMain.handle('find-dicom-files', async (event, { filePath }) => {
   if (filePath.isFolder) {
     const files = getAllFiles(filePath.path);
     const results = await Promise.all(files.map(checkDicomFile));
-    return files.filter((_, index) => results[index]); // Return only DICOM files
+    return results.filter(result => result.isDicom);
   } else {
-    return checkDicomFile(filePath.path).then((isDicom) =>
-      isDicom ? [filePath.path] : []
+    return checkDicomFile(filePath.path).then((result) =>
+      result.isDicom ? [result] : []
     );
   }
 });

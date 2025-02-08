@@ -77,11 +77,11 @@ const App = () => {
     f();
   }, []);
 
-  const saveFile = async ({filePath, outputPath}) => { 
+  const saveFile = async ({filePath, outputPath, invert}) => { 
     const viewport = getViewport();
     const saveFileHelper = async (event) => {
       if (event.detail.viewportId === viewportId) {
-        await saveViewportImage({ filePath: outputPath });
+        await saveViewportImage({ filePath: outputPath, invert });
       }
     };
     divRef.current.addEventListener(
@@ -92,7 +92,7 @@ const App = () => {
     await viewport.setStack(['wadouri:' + filePath]);
   };
 
-  const saveViewportImage = async ({ filePath }) => {
+  const saveViewportImage = async ({ filePath, invert }) => {
     try {
       const viewport = getViewport();
       // This is a vtkImageData
@@ -136,7 +136,9 @@ const App = () => {
         const value16 = scalarData[i];
 
         // Scale from [minVal..maxVal] to [0..255]
-        const gray = 255 - ((value16 - minVal) / range) * 255;
+        let gray = ((value16 - minVal) / range) * 255;
+        if (invert)
+          gray = 255 - gray;
 
         // Write into the Canvas ImageData (RGB + alpha)
         const idx = i * 4;
@@ -284,7 +286,7 @@ const App = () => {
                     const johnsons = await window.electronAPI.findDicomFiles({ filePaths });
                     console.log('johnsons', johnsons);
                     for (let i = 0; i < johnsons.length; i++) {
-                      await saveFile({filePath: johnsons[i], outputPath: `/Users/waddledee72/Downloads/img/image${i}.png`});
+                      await saveFile({filePath: johnsons[i].filePath, invert: johnsons[i].isInverted, outputPath: `/Users/waddledee72/Downloads/img/image${i}.png`});
                     }
                   }}
                   >
