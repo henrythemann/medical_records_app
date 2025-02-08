@@ -56,14 +56,7 @@ const App = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-  const saverHelper = async (event) => {
-    if (event.detail.viewportId === viewportId) {
-      await saveViewportImage({ filePath: '/Users/waddledee72/Downloads/test.png' });
-    }
-    divRef.current.removeEventListener('CORNERSTONE_IMAGE_RENDERED', saverHelper);
-  };
-
-
+  
   useEffect(() => {
     const f = async () => {
       // Init Cornerstone and related libraries
@@ -78,12 +71,26 @@ const App = () => {
         },
       };
       renderingEngine.enableElement(viewportInput);
-      const viewport = renderingEngine.getViewport(viewportId);
-      viewport.setStack(['wadouri:/Users/waddledee72/a.dcm']);
-      divRef.current.addEventListener('CORNERSTONE_IMAGE_RENDERED', saverHelper);
+
+
     }
     f();
   }, []);
+
+  const saveFile = async ({filePath, outputPath}) => { 
+    const viewport = getViewport();
+    const saveFileHelper = async (event) => {
+      if (event.detail.viewportId === viewportId) {
+        await saveViewportImage({ filePath: outputPath });
+      }
+    };
+    divRef.current.addEventListener(
+      'CORNERSTONE_IMAGE_RENDERED',
+      saveFileHelper,
+      { once: true }
+    );
+    await viewport.setStack(['wadouri:' + filePath]);
+  };
 
   const saveViewportImage = async ({ filePath }) => {
     try {
@@ -215,69 +222,78 @@ const App = () => {
           zIndex: 10,
         }}
         >
-        <div style={{
-          position: 'relative',
-        }}
-        >
-          <button
-            className={[styles.viewportButton, showTooltip ? styles.menuX : ''].join(' ')}
-            onClick={() => {
-              setShowTooltip(!showTooltip)
-              setMenuX(!menuX)
-            }}
+          <div style={{
+            position: 'relative',
+          }}
           >
-            <div className={styles.hamburger} >
-              <div className={styles.bar} />
-              <div className={styles.bar} />
-              <div className={styles.bar} />
-            </div>
-          </button>
-        <div className={styles.tooltip} style={showTooltip ? { opacity: '80%' } : { pointerEvents: 'none' }}>
-          <ul>
-            <li>
-              <button onClick={() => {
-                fullScreen ? setFullScreen(false) : setFullScreen(true)
-                setShowTooltip(false);
-              }}>
-              fullscreen
-              </button>
-              </li>
-            <li>
-              <button onClick={() => {
-                const viewport = getViewport();
-                viewport.resetCamera();
-                viewport.render();
-                setShowTooltip(false);
-              }}>
-                reset view
-              </button>
-            </li>
-            <li>
-              <button onClick={async () => {
-                const filePath = await window.electronAPI.openSaveDialog({
-                  defaultPath: 'image.png',
-                  filters: [{ name: 'PNG Image', extensions: ['png'] }],
-                });
-
-                if (!filePath) return;
-
-                saveViewportImage({ filePath });
-                setShowTooltip(false);
-              }}>
-                save image
-              </button>
-            </li>
-            <li>
-              <button onClick={() => {
-                setShowTooltip(false);
+            <button
+              className={[styles.viewportButton, showTooltip ? styles.menuX : ''].join(' ')}
+              onClick={() => {
+                setShowTooltip(!showTooltip)
+                setMenuX(!menuX)
               }}
-              >
-                import images...
-              </button>
-            </li>
-          </ul>
-        </div>
-        </div>
+            >
+              <div className={styles.hamburger} >
+                <div className={styles.bar} />
+                <div className={styles.bar} />
+                <div className={styles.bar} />
+              </div>
+            </button>
+            <div className={styles.tooltip} style={showTooltip ? { opacity: '80%' } : { pointerEvents: 'none' }}>
+              <ul>
+                <li>
+                  <button onClick={() => {
+                    fullScreen ? setFullScreen(false) : setFullScreen(true)
+                    setShowTooltip(false);
+                  }}>
+                    fullscreen
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => {
+                    const viewport = getViewport();
+                    viewport.resetCamera();
+                    viewport.render();
+                    setShowTooltip(false);
+                  }}>
+                    reset view
+                  </button>
+                </li>
+                <li>
+                  <button onClick={async () => {
+                    const filePath = await window.electronAPI.openSaveDialog({
+                      defaultPath: 'image.png',
+                      filters: [{ name: 'PNG Image', extensions: ['png'] }],
+                    });
+
+                    if (!filePath) return;
+
+                    saveViewportImage({ filePath });
+                    setShowTooltip(false);
+                  }}>
+                    save image
+                  </button>
+                </li>
+                <li>
+                  <button onClick={async () => {
+                    const filePaths = await window.electronAPI.openFileDialog({
+                      filters: [{ name: 'All Files', extensions: ['*'] }],
+                    });
+                    if (!filePaths) return;
+                    setShowTooltip(false);
+                    const johnsons = await window.electronAPI.findDicomFiles({ filePaths });
+                    console.log('johnsons', johnsons);
+                    for (let i = 0; i < johnsons.length; i++) {
+                      await saveFile({filePath: johnsons[i], outputPath: `/Users/waddledee72/Downloads/img/image${i}.png`});
+                    }
+                  }}
+                  >
+                    import images...
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
       {!fullScreen && (
@@ -285,11 +301,11 @@ const App = () => {
           <p>Choose a DICOM file:</p>
           <input
             type="file"
-            onChange={(e) => {
+            onChange={async (e) => {
               if (e.target.files?.length > 0) {
                 const viewport = getViewport();
                 viewport.resetCamera();
-                viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])]);
+                await viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])])
               }
             }}
           />
