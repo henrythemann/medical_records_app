@@ -21,4 +21,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getThumbsPath: () => ipcRenderer.invoke('get-thumbs-path'),
   joinPaths: ( paths ) => ipcRenderer.invoke('join-paths', { paths }),
   dbQuery: ({ query }) => ipcRenderer.invoke('db-query', { query }),
+  decryptFile: ({ inFilePath, outFilePath, key }) => ipcRenderer.invoke('decrypt-file', { inFilePath, outFilePath, key }),
 });

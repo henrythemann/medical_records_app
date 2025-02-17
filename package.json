@@ -31,6 +31,7 @@
     "@cornerstonejs/tools": "^2.19.7",
     "better-sqlite3": "^11.8.1",
     "dcmjs": "^0.38.0",
+    "dicom-parser": "^1.8.21",
     "dicomweb-client": "^0.10.4",
     "electron-squirrel-startup": "^1.0.1",
     "react": "^19.0.0",
@@ -47,7 +48,8 @@
     "dev": "DEBUG=true concurrently \"npm:watch\" \"npm:start_dev\"",
     "depcheck": "node scripts/checkForUnusedDependencies.js",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "dotnet": "export PATH=$PATH:/usr/local/share/dotnet/ && cd DotnetDecryptDll && dotnet publish -r osx-arm64 -c Release /p:PublishSingleFile=true /p:SelfContained=true && cd ..",
+    "make": "npm run dotnet && electron-forge make"
   },
   "author": "",
   "license": "ISC",

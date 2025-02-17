@@ -19,6 +19,10 @@ const App = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [menuX, setMenuX] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [showEncryptionDialog, setShowEncryptionDialog] = useState(false);
+  const [encryptionDialogMessage, setEncryptionDialogMessage] = useState('Found some files that were encrypted. Please enter the password:');
+  const decryptionPassword = useRef(null);
+  const encryptedSet = useRef(new Set());
 
   const [fullScreen, setFullScreen_] = useState(false);
   const setFullScreen = (bool) => {
@@ -30,6 +34,63 @@ const App = () => {
     const renderingEngine = getRenderingEngine(renderingEngineId);
     return renderingEngine.getViewport(viewportId);
   };
+  const handleDecrypt = async () => {
+    // BUG: potential issue if some files successfully decrypt and others don't
+    setShowEncryptionDialog(false);
+    try {
+      await decrypt({ fileSet: encryptedSet.current, key: decryptionPassword.current.value });
+      await handleImportFiles({ filePaths: Array.from(encryptedSet.current), firstPass: false });
+
+    } catch (e) {
+      console.error('Error decrypting files:', e);
+      decryptionPassword.current.value = '';
+      setEncryptionDialogMessage('Unable to decrypt (decryption has only been tested with files encrypted by DCSView). Please try again:');
+      setShowEncryptionDialog(true);
+    }
+  };
+
+  const handleImportFiles = async ({ filePaths, firstPass }) => {
+    setModalMessage('Finding DICOM files...');
+    setShowTooltip(false);
+    const johnsons = await window.electronAPI.findDicomFiles({ filePaths });
+    console.log(johnsons[0])
+    const thumbsPath = await window.electronAPI.getThumbsPath();
+    const keySet = new Set();
+    if (firstPass) {
+      encryptedSet.current = new Set();
+    }
+    for (let i = 0; i < johnsons.length; i++) {
+      setModalMessage(`Importing ${i + 1} of ${johnsons.length}...`);
+      for (let j = 0; j < johnsons[i]?.metadata?.length; j++)
+        keySet.add(johnsons[i].metadata[j].key);
+      if (!johnsons[i].isEncrypted) {
+        const newPath = await window.electronAPI.joinPaths([thumbsPath, `image${i}.png`]);
+        await saveFile({ filePath: johnsons[i].filePath, invert: johnsons[i].isInverted, outputPath: newPath });
+        // await window.electronAPI.dbQuery({ query: `INSERT INTO imaging (path, hospital_name) VALUES ('${newPath}', '${johnsons[i].hospitalName}')` });
+      } else {
+        if (firstPass)
+          encryptedSet.current.add(johnsons[i].filePath);
+        else
+          console.error('Found encrypted file on second pass:', johnsons[i].filePath);
+      }
+    }
+    console.log(keySet);
+    setModalMessage('');
+    if (encryptedSet.current.size > 0) {
+      setShowEncryptionDialog(true);
+    }
+  };
+
+  const decrypt = async ({ fileSet, key }) => {
+    for (const inFilePath of fileSet) {
+      await window.electronAPI.decryptFile({ inFilePath, outFilePath: inFilePath + '_decrypt', key: decryptionPassword.current.value });
+    }
+  }
+  useEffect(() => {
+    if (showEncryptionDialog) {
+      decryptionPassword.current.focus();
+    }
+  }, [showEncryptionDialog]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -73,7 +134,6 @@ const App = () => {
         },
       };
       renderingEngine.enableElement(viewportInput);
-
 
     }
     f();
@@ -204,6 +264,40 @@ const App = () => {
         </div>
       }
       <div
+        id='modal-overlay'
+        className={styles.modalOverlay}
+        style={showEncryptionDialog ? null : { display: 'none', pointerEvents: 'none' }}
+      >
+        <div id='modal' className={styles.modal} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1rem',
+          padding: '0.75rem 2rem',
+          maxWidth: '30rem',
+          position: 'relative',
+        }}>
+          <div style={{
+            position: 'absolute',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            top: '0.5rem',
+            right: '0.5rem',
+            width: '0.5rem',
+            height: '0.5rem',
+          }}>
+            <button onClick={() => setShowEncryptionDialog(false)}>&#215;</button>
+          </div>
+          <span>{encryptionDialogMessage}</span>
+          <input ref={decryptionPassword} onKeyDown={(e) => {
+            if (e.key === 'Enter') handleDecrypt();
+          }} type='password' />
+          <button style={{ padding: '0.25rem 1rem' }} onClick={handleDecrypt}>Decrypt</button>
+        </div>
+      </div>
+      <div
         id='cornerstone-element'
         ref={divRef}
         style={{
@@ -291,27 +385,7 @@ const App = () => {
                       filters: [{ name: 'All Files', extensions: ['*'] }],
                     });
                     if (!filePaths) return;
-                    let foundEncrypted = false;
-                    setModalMessage('Finding DICOM files...');
-                    setShowTooltip(false);
-                    const johnsons = await window.electronAPI.findDicomFiles({ filePaths });
-                    console.log(johnsons[0])
-                    const thumbsPath = await window.electronAPI.getThumbsPath();
-                    const keySet = new Set();
-                    for (let i = 0; i < johnsons.length; i++) {
-                      setModalMessage(`Importing ${i + 1} of ${johnsons.length}...`);
-                      for (let j = 0; j < johnsons[i]?.metadata?.length; j++)
-                        keySet.add(johnsons[i].metadata[j].key);
-                      if (!johnsons[i].isEncrypted) {
-                      const newPath = await window.electronAPI.joinPaths([thumbsPath, `image${i}.png`]);
-                      await saveFile({ filePath: johnsons[i].filePath, invert: johnsons[i].isInverted, outputPath: newPath });
-                      // await window.electronAPI.dbQuery({ query: `INSERT INTO imaging (path, hospital_name) VALUES ('${newPath}', '${johnsons[i].hospitalName}')` });
-                      } else {
-                        foundEncrypted = true;
-                      }
-                    }
-                    console.log(keySet);
-                    setModalMessage(foundEncrypted ? 'Some files were encrypted and could not be imported' : '');
+                    await handleImportFiles({ filePaths, firstPass: true });
                   }}
                   >
                     import images...

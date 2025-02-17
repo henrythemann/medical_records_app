@@ -6,6 +6,9 @@ module.exports = {
     asar: true,
     icon: "./icon/icon.icns",
     name: "V-SNAP",
+    extraResource: [
+      "DotnetDecryptDll/bin/Release/net9.0/osx-arm64/publish/DotnetDecryptDll"
+    ],
   },
   rebuildConfig: {},
   makers: [

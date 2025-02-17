@@ -13,6 +13,10 @@ let mainWindow;
 const appDataPath = app.getPath('userData');
 const thumbsPath = path.join(appDataPath, 'thumbs');
 const dbPath = path.join(appDataPath, 'db.sqlite');
+const isDev = process.defaultApp || /electron-prebuilt/.test(process.execPath);
+const decryptPath = isDev
+  ? path.join(__dirname, 'DotnetDecryptDll', 'bin', 'Release', 'net9.0', 'osx-arm64', 'publish', 'DotnetDecryptDll')
+  : path.join(process.resourcesPath, 'DotnetDecryptDll');
 
 app.on('ready', async () => {
   mainWindow = new BrowserWindow({
@@ -255,6 +259,32 @@ ipcMain.handle('find-dicom-files', async (event, { filePath }) => {
     );
   }
 });
+
+ipcMain.handle('decrypt-file', async (event, { inFilePath, outFilePath, key }) => {
+  return new Promise((resolve, reject) => {
+    const child = require('child_process').spawn(
+      decryptPath,
+      [inFilePath, outFilePath, key],
+      { stdio: 'pipe' }
+    );
+    let output = '';
+    child.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+    child.on('error', (err) => {
+      console.error('Error decrypting file:', err);
+      reject(err);
+    });
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve(output);
+      } else {
+        reject({ message: output, code });
+      }
+    });
+  });
+});
+
 
 const createFolderIfNotExists = async (folderPath) => {
   try {

@@ -11,11 +11,11 @@ class Program
 {
 	static void Main(string[] args)
 	{
-		if (args.Length != 2)
+		if (args.Length != 3)
 		{
-			Console.WriteLine("Usage: DotnetDecryptDll <input file> <password>");
+			Console.WriteLine("Usage: DotnetDecryptDll <input file> <output file> <password>");
 		}
-		AESEncrypt.Decrypt(args[0], args[0] + "_decrypt", args[1]);
+		AESEncrypt.Decrypt(args[0], args[1], args[2]);
 	}
 }
 
@@ -126,7 +126,6 @@ internal class AESEncrypt
 
 	public static void Decrypt(string EncryptedFile, string OutputFile, string Password)
 	{
-		Console.WriteLine("Decrypt1");
 		using (Stream encryptedStream = File.OpenRead(EncryptedFile))
 		{
 			using (Stream objOutput = File.OpenWrite(OutputFile))
@@ -140,7 +139,6 @@ internal class AESEncrypt
 
 	public static Stream Decrypt(Stream EncryptedStream, string Password)
 	{
-		Console.WriteLine("Decrypt2");
 		return CmsEncryption.Decrypt(EncryptedStream, Password);
 	}
 
@@ -209,29 +207,6 @@ internal class CmsEncryption
 			throw new Exception(ex.Message);
 		}
 	}
-	public static void PrintPkcs5Key(Pkcs5Scheme2Utf8PbeKey key)
-	{
-		// Print public properties
-		foreach (PropertyInfo prop in key.GetType().GetProperties())
-		{
-			Console.WriteLine($"{prop.Name}: {prop.GetValue(key)}");
-		}
-
-		// Print private fields
-		foreach (FieldInfo field in key.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
-		{
-			object value = field.GetValue(key);
-			// If the field is a byte array, print it in hex.
-			if (value is byte[] bytes)
-			{
-				Console.WriteLine($"{field.Name}: {BitConverter.ToString(bytes)}");
-			}
-			else
-			{
-				Console.WriteLine($"{field.Name}: {value}");
-			}
-		}
-	}
 	private static Stream InternalDecrypt(Stream Stream, string Password)
 	{
 		try
@@ -239,16 +214,11 @@ internal class CmsEncryption
 			CmsEnvelopedDataParser cmsEnvelopedDataParser = new CmsEnvelopedDataParser(Stream);
 			RecipientID selector = new RecipientID();
 			RecipientInformation firstRecipient = cmsEnvelopedDataParser.GetRecipientInfos().GetFirstRecipient(selector);
-			Console.WriteLine("firstRecipient: " + firstRecipient);
 			PasswordRecipientInformation passwordRecipientInformation = (PasswordRecipientInformation)firstRecipient;
 			DerSequence derSequence = (DerSequence)passwordRecipientInformation.KeyDerivationAlgorithm.Parameters;
 			byte[] salt = ((DerOctetString)derSequence[0]).GetOctets();
-			Console.WriteLine("Salt (hex): " + BitConverter.ToString(salt));
 			int iterations = ((DerInteger)derSequence[1]).Value.IntValue;
-			Console.WriteLine("iterations: " + iterations);
-			Pkcs5Scheme2Utf8PbeKey key = new Pkcs5Scheme2Utf8PbeKey(Password.ToCharArray(), salt, iterations);
-			PrintPkcs5Key(key);
-			return firstRecipient.GetContentStream(key).ContentStream;
+			return firstRecipient.GetContentStream(new Pkcs5Scheme2Utf8PbeKey(Password.ToCharArray(), salt, iterations)).ContentStream;
 		}
 		catch (InvalidCipherTextException ex)
 		{
