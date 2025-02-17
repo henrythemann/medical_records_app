@@ -166,17 +166,20 @@
     opacity: 0;
   }
 }
-
+.modalOverlay .modal,
+.tooltip {
+  background-color: #66665588;
+  color: #ffc;
+  font-size: 0.75rem;
+  font-family: monospace;
+  border: 1px solid black;
+  user-select: none;
+}
 .tooltip {
   position: absolute;
   z-index: 10;
   white-space: nowrap;
-  font-family: monospace;
-  background-color: #443;
-  color: #ffc;
-  font-size: 0.75rem;
   padding: 0.25rem 0;
-  border: 1px solid black;
   opacity: 0%;
   top: calc(100% + 0.5rem);
   right: 0;
@@ -200,4 +203,24 @@
 
 .tooltip li:hover {
   background-color: #555;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #00000033;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modalOverlay .modal {
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

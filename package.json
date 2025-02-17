@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@babel/core": "^7.26.7",
+    "@babel/core": "^7.26.8",
     "@babel/preset-react": "^7.26.3",
     "@electron-forge/cli": "^7.6.1",
     "@electron-forge/maker-deb": "^7.6.1",
@@ -13,7 +13,7 @@
     "babel-loader": "^9.2.1",
     "concurrently": "^9.1.2",
     "css-loader": "^7.1.2",
-    "electron": "^34.0.1",
+    "electron": "^34.1.1",
     "electron-reload": "^2.0.0-alpha.1",
     "path-browserify": "^1.0.1",
     "style-loader": "^4.0.0",
@@ -21,20 +21,21 @@
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.0"
   },
-  "name": "medical_records_app",
+  "name": "v-snap",
   "version": "1.0.0",
   "main": "main.js",
   "dependencies": {
     "@cornerstonejs/calculate-suv": "^1.1.0",
-    "@cornerstonejs/core": "^2.17.5",
-    "@cornerstonejs/dicom-image-loader": "^2.17.5",
-    "@cornerstonejs/tools": "^2.17.5",
+    "@cornerstonejs/core": "^2.19.7",
+    "@cornerstonejs/dicom-image-loader": "^2.19.7",
+    "@cornerstonejs/tools": "^2.19.7",
+    "better-sqlite3": "^11.8.1",
     "dcmjs": "^0.38.0",
     "dicomweb-client": "^0.10.4",
     "electron-squirrel-startup": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sass": "^1.83.4"
+    "sass": "^1.84.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

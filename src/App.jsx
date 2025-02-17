@@ -18,6 +18,7 @@ const App = () => {
   const divRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [menuX, setMenuX] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   const [fullScreen, setFullScreen_] = useState(false);
   const setFullScreen = (bool) => {
@@ -56,9 +57,10 @@ const App = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-  
+
   useEffect(() => {
     const f = async () => {
+      await window.electronAPI.init();
       // Init Cornerstone and related libraries
       await initDemo();
       const renderingEngine = new RenderingEngine(renderingEngineId);
@@ -77,7 +79,7 @@ const App = () => {
     f();
   }, []);
 
-  const saveFile = async ({filePath, outputPath, invert}) => { 
+  const saveFile = async ({ filePath, outputPath, invert }) => {
     const viewport = getViewport();
     const saveFileHelper = async (event) => {
       if (event.detail.viewportId === viewportId) {
@@ -194,6 +196,13 @@ const App = () => {
 
   return (
     <div className={styles.noOverflow}>
+      {modalMessage &&
+        <div id='modal-overlay' className={styles.modalOverlay} >
+          <div id='modal' className={styles.modal}>
+            <p>{modalMessage}</p>
+          </div>
+        </div>
+      }
       <div
         id='cornerstone-element'
         ref={divRef}
@@ -282,12 +291,27 @@ const App = () => {
                       filters: [{ name: 'All Files', extensions: ['*'] }],
                     });
                     if (!filePaths) return;
+                    let foundEncrypted = false;
+                    setModalMessage('Finding DICOM files...');
                     setShowTooltip(false);
                     const johnsons = await window.electronAPI.findDicomFiles({ filePaths });
-                    console.log('johnsons', johnsons);
+                    console.log(johnsons[0])
+                    const thumbsPath = await window.electronAPI.getThumbsPath();
+                    const keySet = new Set();
                     for (let i = 0; i < johnsons.length; i++) {
-                      await saveFile({filePath: johnsons[i].filePath, invert: johnsons[i].isInverted, outputPath: `/Users/waddledee72/Downloads/img/image${i}.png`});
+                      setModalMessage(`Importing ${i + 1} of ${johnsons.length}...`);
+                      for (let j = 0; j < johnsons[i]?.metadata?.length; j++)
+                        keySet.add(johnsons[i].metadata[j].key);
+                      if (!johnsons[i].isEncrypted) {
+                      const newPath = await window.electronAPI.joinPaths([thumbsPath, `image${i}.png`]);
+                      await saveFile({ filePath: johnsons[i].filePath, invert: johnsons[i].isInverted, outputPath: newPath });
+                      // await window.electronAPI.dbQuery({ query: `INSERT INTO imaging (path, hospital_name) VALUES ('${newPath}', '${johnsons[i].hospitalName}')` });
+                      } else {
+                        foundEncrypted = true;
+                      }
                     }
+                    console.log(keySet);
+                    setModalMessage(foundEncrypted ? 'Some files were encrypted and could not be imported' : '');
                   }}
                   >
                     import images...
