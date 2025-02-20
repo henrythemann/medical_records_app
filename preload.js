@@ -17,9 +17,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return results;
   },
   createFolderIfNotExists: ({ folderPath }) => ipcRenderer.invoke('create-folder-if-not-exists', { folderPath }),
+  copyFile: ({ srcPath, destPath }) => ipcRenderer.invoke('copy-file', { srcPath, destPath }),
   getAppDataPath: () => ipcRenderer.invoke('get-app-data-path'),
   getThumbsPath: () => ipcRenderer.invoke('get-thumbs-path'),
+  getDicomPath: () => ipcRenderer.invoke('get-dicom-path'),
   joinPaths: ( paths ) => ipcRenderer.invoke('join-paths', { paths }),
   dbQuery: ({ query }) => ipcRenderer.invoke('db-query', { query }),
+  dbAddImage: (columns) => ipcRenderer.invoke('db-add-image', {columns}),
   decryptFile: ({ inFilePath, outFilePath, key }) => ipcRenderer.invoke('decrypt-file', { inFilePath, outFilePath, key }),
 });

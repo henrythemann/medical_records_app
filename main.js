@@ -6,12 +6,14 @@ if (DEBUG)
 const path = require('path');
 const fs = require('fs');
 const dicomParser = require('dicom-parser');
+const { spawn } = require('child_process');
 const Database = require('better-sqlite3');
-const dicomFields = require('./dicomFields.json');
+const dicomFields = require('./dicomFieldsSmall.json');
 
 let mainWindow;
 const appDataPath = app.getPath('userData');
 const thumbsPath = path.join(appDataPath, 'thumbs');
+const dicomPath = path.join(appDataPath, 'dicom');
 const dbPath = path.join(appDataPath, 'db.sqlite');
 const isDev = process.defaultApp || /electron-prebuilt/.test(process.execPath);
 const decryptPath = isDev
@@ -41,25 +43,30 @@ app.on('ready', async () => {
 ipcMain.on('init', async (event) => {
   // Ensure the database directory exists
   await createFolderIfNotExists(thumbsPath);
+  await createFolderIfNotExists(dicomPath);
 
   // Connect to SQLite (this will create the database file if it doesn't exist)
   const db = new Database(dbPath);
   const query = `
     CREATE TABLE IF NOT EXISTS imaging (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      path TEXT UNIQUE NOT NULL,
-      ${Object.keys(dicomFields).map(key => `${key} ${getDicomValue({ key, sqlite: true })}`).join(',\n')}
+      filePath TEXT UNIQUE NOT NULL,
+      thumbPath TEXT UNIQUE NOT NULL,
+      ${Object.keys(dicomFields).map(key => `${key} ${getDicomValue({ key, getType: true })}${key === 'sopInstanceUid' ? ' UNIQUE NOT NULL' : ''}`).join(',\n')}
     );
   `;
   db.exec(query);
   db.close();
 });
 ipcMain.handle('db-query', async (event, { query, params = [] }) => {
+  return await executeQuery({ query, params });
+});
+const executeQuery = async ({query, params = []}) => {
   let db;
   try {
     db = new Database(dbPath, { readonly: false }); // Open in read/write mode
     const stmt = db.prepare(query);
-
+  
     // Check if it's a SELECT query
     if (/^\s*SELECT/i.test(query)) {
       const rows = stmt.all(...params); // Fetch multiple rows
@@ -74,12 +81,30 @@ ipcMain.handle('db-query', async (event, { query, params = [] }) => {
   } finally {
     if (db) db.close(); // Ensure database is closed
   }
+};
+ipcMain.handle('db-add-image', async (event, { columns }) => {
+  try {
+    const query = `INSERT INTO imaging (filePath, thumbPath, ${columns.metadata.map(x => x.key).join(',')}) VALUES (?, ?, ${columns.metadata.map(x => '?').join(', ')})`;
+    let params = [columns.filePath, columns.thumbPath];
+    console.log('filePath:', columns.filePath);
+    for (let i = 0; i < columns.metadata.length; i++) {
+      params.push(columns.metadata[i].value);
+    }
+    const result = executeQuery({ query, params })
+    return result;
+  } catch (error) {
+    console.error('Database insert error:', error);
+    return { success: false, error: error.message };
+  } 
 });
 ipcMain.handle('get-app-data-path', () => {
   return appDataPath;
 });
 ipcMain.handle('get-thumbs-path', () => {
   return thumbsPath;
+});
+ipcMain.handle('get-dicom-path', () => {
+  return dicomPath;
 });
 ipcMain.handle('join-paths', (event, { paths }) => {
   return path.join(...paths);
@@ -103,6 +128,16 @@ ipcMain.handle('save-viewport-image', async (event, { filePath, content }) => {
     return { success: true, filePath };
   } catch (error) {
     return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('copy-file', async (event, { srcPath, destPath }) => {
+  try {
+    await fs.promises.copyFile(srcPath, destPath, fs.constants.COPYFILE_EXCL);
+    return destPath;
+  } catch (err) {
+    console.error('Error copying file:', err);
+    throw err;
   }
 });
 
@@ -160,7 +195,7 @@ const getAllFiles = (dirPath) => {
   return fileList;
 };
 
-const getDicomValue = ({ dicomDataSet, key, sqlite = false }) => {
+const getDicomValue = ({ dicomDataSet, key, getType = false }) => {
   const vr = dicomFields[key]?.vr.substring(0, 2);
   const bytes = dicomFields[key]?.bytes;
   try {
@@ -168,22 +203,22 @@ const getDicomValue = ({ dicomDataSet, key, sqlite = false }) => {
       case 'AE': case 'AS': case 'CS': case 'DA': case 'DT': case 'LO':
       case 'LT': case 'PN': case 'SH': case 'ST': case 'UC': case 'UI':
       case 'UR': case 'TM': case 'UT': {
-        return sqlite ? 'TEXT' : dicomDataSet.string(bytes); // Text-based VRs
+        return getType ? 'TEXT' : dicomDataSet.string(bytes); // Text-based VRs
       }
       case 'DS': case 'IS': {
-        return sqlite ? 'TEXT' : dicomDataSet.string(bytes); // Numeric as string
+        return getType ? 'TEXT' : dicomDataSet.string(bytes); // Numeric as string
       }
       case 'US': case 'SS': {
-        return sqlite ? 'INTEGER' : dicomDataSet.uint16(bytes) || dicomDataSet.int16(bytes); // 16-bit integers
+        return getType ? 'INTEGER' : dicomDataSet.uint16(bytes) || dicomDataSet.int16(bytes); // 16-bit integers
       }
       case 'UL': case 'SL': {
-        return sqlite ? 'INTEGER' : dicomDataSet.uint32(bytes) || dicomDataSet.int32(bytes); // 32-bit integers
+        return getType ? 'INTEGER' : dicomDataSet.uint32(bytes) || dicomDataSet.int32(bytes); // 32-bit integers
       }
       case 'FL': {
-        return sqlite ? 'REAL' : dicomDataSet.float(bytes); // 32-bit float
+        return getType ? 'REAL' : dicomDataSet.float(bytes); // 32-bit float
       }
       case 'FD': {
-        return sqlite ? 'REAL' : dicomDataSet.double(bytes); // 64-bit float
+        return getType ? 'REAL' : dicomDataSet.double(bytes); // 64-bit float
       }
       case 'SQ':
         // console.log('Sequence, not doing it');
@@ -261,29 +296,31 @@ ipcMain.handle('find-dicom-files', async (event, { filePath }) => {
 });
 
 ipcMain.handle('decrypt-file', async (event, { inFilePath, outFilePath, key }) => {
-  return new Promise((resolve, reject) => {
-    const child = require('child_process').spawn(
-      decryptPath,
-      [inFilePath, outFilePath, key],
-      { stdio: 'pipe' }
-    );
-    let output = '';
-    child.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-    child.on('error', (err) => {
-      console.error('Error decrypting file:', err);
-      reject(err);
-    });
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve(output);
-      } else {
-        reject({ message: output, code });
-      }
-    });
+  let output = '';
+
+  // Spawn the process (only need to pipe stdout if that's what you care about)
+  const child = spawn(decryptPath, [inFilePath, outFilePath, key], { stdio: ['ignore', 'pipe', 'pipe'] });
+  
+  // Set encoding so we work with strings
+  child.stdout.setEncoding('utf8');
+  
+  // Accumulate stdout data as it comes in
+  for await (const chunk of child.stdout) {
+    output += chunk;
+  }
+
+  // Wait for the process to complete
+  const exitCode = await new Promise((resolve, reject) => {
+    child.on('error', reject);
+    child.on('close', resolve);
   });
+
+  if (exitCode !== 0) {
+    throw new Error(`Decryption failed with exit code ${exitCode}: ${output}`);
+  }
+  return output;
 });
+
 
 
 const createFolderIfNotExists = async (folderPath) => {

@@ -1,0 +1,1250 @@
+{
+    "fileMetaInformationGroupLength": {
+        "bytes": "x00020000",
+        "vr": "UL",
+        "retired": false,
+        "title": "File Meta Information Group Length"
+    },
+    "mediaStorageSopClassUid": {
+        "bytes": "x00020002",
+        "vr": "UI",
+        "retired": false,
+        "title": "Media Storage SOP Class UID"
+    },
+    "transferSyntaxUid": {
+        "bytes": "x00020010",
+        "vr": "UI",
+        "retired": false,
+        "title": "Transfer Syntax UID"
+    },
+    "imageType": {
+        "bytes": "x00080008",
+        "vr": "CS",
+        "retired": false,
+        "title": "Image Type"
+    },
+    "sopClassUid": {
+        "bytes": "x00080016",
+        "vr": "UI",
+        "retired": false,
+        "title": "SOP Class UID"
+    },
+    "sopInstanceUid": {
+        "bytes": "x00080018",
+        "vr": "UI",
+        "retired": false,
+        "title": "SOP Instance UID"
+    },
+    "studyDate": {
+        "bytes": "x00080020",
+        "vr": "DA",
+        "retired": false,
+        "title": "Study Date"
+    },
+    "seriesDate": {
+        "bytes": "x00080021",
+        "vr": "DA",
+        "retired": false,
+        "title": "Series Date"
+    },
+    "acquisitionDate": {
+        "bytes": "x00080022",
+        "vr": "DA",
+        "retired": false,
+        "title": "Acquisition Date"
+    },
+    "contentDate": {
+        "bytes": "x00080023",
+        "vr": "DA",
+        "retired": false,
+        "title": "Content Date"
+    },
+    "studyTime": {
+        "bytes": "x00080030",
+        "vr": "TM",
+        "retired": false,
+        "title": "Study Time"
+    },
+    "seriesTime": {
+        "bytes": "x00080031",
+        "vr": "TM",
+        "retired": false,
+        "title": "Series Time"
+    },
+    "acquisitionTime": {
+        "bytes": "x00080032",
+        "vr": "TM",
+        "retired": false,
+        "title": "Acquisition Time"
+    },
+    "contentTime": {
+        "bytes": "x00080033",
+        "vr": "TM",
+        "retired": false,
+        "title": "Content Time"
+    },
+    "modality": {
+        "bytes": "x00080060",
+        "vr": "CS",
+        "retired": false,
+        "title": "Modality"
+    },
+    "manufacturer": {
+        "bytes": "x00080070",
+        "vr": "LO",
+        "retired": false,
+        "title": "Manufacturer"
+    },
+    "institutionName": {
+        "bytes": "x00080080",
+        "vr": "LO",
+        "retired": false,
+        "title": "Institution Name"
+    },
+    "referringPhysiciansName": {
+        "bytes": "x00080090",
+        "vr": "PN",
+        "retired": false,
+        "title": "Referring Physician's Name"
+    },
+    "stationName": {
+        "bytes": "x00081010",
+        "vr": "SH",
+        "retired": false,
+        "title": "Station Name"
+    },
+    "studyDescription": {
+        "bytes": "x00081030",
+        "vr": "LO",
+        "retired": false,
+        "title": "Study Description"
+    },
+    "operatorsName": {
+        "bytes": "x00081070",
+        "vr": "PN",
+        "retired": false,
+        "title": "Operators' Name"
+    },
+    "derivationDescription": {
+        "bytes": "x00082111",
+        "vr": "ST",
+        "retired": false,
+        "title": "Derivation Description"
+    },
+    "patientsName": {
+        "bytes": "x00100010",
+        "vr": "PN",
+        "retired": false,
+        "title": "Patient's Name"
+    },
+    "patientId": {
+        "bytes": "x00100020",
+        "vr": "LO",
+        "retired": false,
+        "title": "Patient ID"
+    },
+    "patientsBirthDate": {
+        "bytes": "x00100030",
+        "vr": "DA",
+        "retired": false,
+        "title": "Patient's Birth Date"
+    },
+    "patientsSex": {
+        "bytes": "x00100040",
+        "vr": "CS",
+        "retired": false,
+        "title": "Patient's Sex"
+    },
+    "patientsAge": {
+        "bytes": "x00101010",
+        "vr": "AS",
+        "retired": false,
+        "title": "Patient's Age"
+    },
+    "bodyPartExamined": {
+        "bytes": "x00180015",
+        "vr": "CS",
+        "retired": false,
+        "title": "Body Part Examined"
+    },
+    "plateId": {
+        "bytes": "x00181004",
+        "vr": "LO",
+        "retired": false,
+        "title": "Plate ID"
+    },
+    "imagerPixelSpacing": {
+        "bytes": "x00181164",
+        "vr": "DS",
+        "retired": false,
+        "title": "Imager Pixel Spacing"
+    },
+    "acquisitionDeviceProcessingDescription": {
+        "bytes": "x00181400",
+        "vr": "LO",
+        "retired": false,
+        "title": "Acquisition Device Processing Description"
+    },
+    "acquisitionDeviceProcessingCode": {
+        "bytes": "x00181401",
+        "vr": "LO",
+        "retired": false,
+        "title": "Acquisition Device Processing Code"
+    },
+    "positionerType": {
+        "bytes": "x00181508",
+        "vr": "CS",
+        "retired": false,
+        "title": "Positioner Type"
+    },
+    "sensitivity": {
+        "bytes": "x00186000",
+        "vr": "DS",
+        "retired": false,
+        "title": "Sensitivity"
+    },
+    "seriesNumber": {
+        "bytes": "x00200011",
+        "vr": "IS",
+        "retired": false,
+        "title": "Series Number"
+    },
+    "acquisitionNumber": {
+        "bytes": "x00200012",
+        "vr": "IS",
+        "retired": false,
+        "title": "Acquisition Number"
+    },
+    "instanceNumber": {
+        "bytes": "x00200013",
+        "vr": "IS",
+        "retired": false,
+        "title": "Instance Number"
+    },
+    "samplesPerPixel": {
+        "bytes": "x00280002",
+        "vr": "US",
+        "retired": false,
+        "title": "Samples per Pixel"
+    },
+    "photometricInterpretation": {
+        "bytes": "x00280004",
+        "vr": "CS",
+        "retired": false,
+        "title": "Photometric Interpretation"
+    },
+    "rows": {
+        "bytes": "x00280010",
+        "vr": "US",
+        "retired": false,
+        "title": "Rows"
+    },
+    "columns": {
+        "bytes": "x00280011",
+        "vr": "US",
+        "retired": false,
+        "title": "Columns"
+    },
+    "pixelSpacing": {
+        "bytes": "x00280030",
+        "vr": "DS",
+        "retired": false,
+        "title": "Pixel Spacing"
+    },
+    "bitsAllocated": {
+        "bytes": "x00280100",
+        "vr": "US",
+        "retired": false,
+        "title": "Bits Allocated"
+    },
+    "bitsStored": {
+        "bytes": "x00280101",
+        "vr": "US",
+        "retired": false,
+        "title": "Bits Stored"
+    },
+    "highBit": {
+        "bytes": "x00280102",
+        "vr": "US",
+        "retired": false,
+        "title": "High Bit"
+    },
+    "pixelRepresentation": {
+        "bytes": "x00280103",
+        "vr": "US",
+        "retired": false,
+        "title": "Pixel Representation"
+    },
+    "rescaleIntercept": {
+        "bytes": "x00281052",
+        "vr": "DS",
+        "retired": false,
+        "title": "Rescale Intercept"
+    },
+    "rescaleSlope": {
+        "bytes": "x00281053",
+        "vr": "DS",
+        "retired": false,
+        "title": "Rescale Slope"
+    },
+    "rescaleType": {
+        "bytes": "x00281054",
+        "vr": "LO",
+        "retired": false,
+        "title": "Rescale Type"
+    },
+    "lossyImageCompression": {
+        "bytes": "x00282110",
+        "vr": "CS",
+        "retired": false,
+        "title": "Lossy Image Compression"
+    },
+    "requestingService": {
+        "bytes": "x00321033",
+        "vr": "LO",
+        "retired": false,
+        "title": "Requesting Service"
+    },
+    "imageDisplayFormat": {
+        "bytes": "x20100010",
+        "vr": "ST",
+        "retired": false,
+        "title": "Image Display Format"
+    },
+    "annotationDisplayFormatId": {
+        "bytes": "x20100030",
+        "vr": "CS",
+        "retired": false,
+        "title": "Annotation Display Format ID"
+    },
+    "filmOrientation": {
+        "bytes": "x20100040",
+        "vr": "CS",
+        "retired": false,
+        "title": "Film Orientation"
+    },
+    "borderDensity": {
+        "bytes": "x20100100",
+        "vr": "CS",
+        "retired": false,
+        "title": "Border Density"
+    },
+    "trim": {
+        "bytes": "x20100140",
+        "vr": "CS",
+        "retired": false,
+        "title": "Trim"
+    },
+    "mediaStorageSopInstanceUid": {
+        "bytes": "x00020003",
+        "vr": "UI",
+        "retired": false,
+        "title": "Media Storage SOP Instance UID"
+    },
+    "implementationClassUid": {
+        "bytes": "x00020012",
+        "vr": "UI",
+        "retired": false,
+        "title": "Implementation Class UID"
+    },
+    "implementationVersionName": {
+        "bytes": "x00020013",
+        "vr": "SH",
+        "retired": false,
+        "title": "Implementation Version Name"
+    },
+    "specificCharacterSet": {
+        "bytes": "x00080005",
+        "vr": "CS",
+        "retired": false,
+        "title": "Specific Character Set"
+    },
+    "accessionNumber": {
+        "bytes": "x00080050",
+        "vr": "SH",
+        "retired": false,
+        "title": "Accession Number"
+    },
+    "modalitiesInStudy": {
+        "bytes": "x00080061",
+        "vr": "CS",
+        "retired": false,
+        "title": "Modalities in Study"
+    },
+    "institutionAddress": {
+        "bytes": "x00080081",
+        "vr": "ST",
+        "retired": false,
+        "title": "Institution Address"
+    },
+    "timezoneOffsetFromUtc": {
+        "bytes": "x00080201",
+        "vr": "SH",
+        "retired": false,
+        "title": "Timezone Offset From UTC"
+    },
+    "physiciansOfRecord": {
+        "bytes": "x00081048",
+        "vr": "PN",
+        "retired": false,
+        "title": "Physician(s) of Record"
+    },
+    "performingPhysiciansName": {
+        "bytes": "x00081050",
+        "vr": "PN",
+        "retired": false,
+        "title": "Performing Physician's Name"
+    },
+    "manufacturersModelName": {
+        "bytes": "x00081090",
+        "vr": "LO",
+        "retired": false,
+        "title": "Manufacturer's Model Name"
+    },
+    "issuerOfPatientId": {
+        "bytes": "x00100021",
+        "vr": "LO",
+        "retired": false,
+        "title": "Issuer of Patient ID"
+    },
+    "patientsAddress": {
+        "bytes": "x00101040",
+        "vr": "LO",
+        "retired": false,
+        "title": "Patient's Address"
+    },
+    "patientsMothersBirthName": {
+        "bytes": "x00101060",
+        "vr": "PN",
+        "retired": false,
+        "title": "Patient's Mother's Birth Name"
+    },
+    "countryOfResidence": {
+        "bytes": "x00102150",
+        "vr": "LO",
+        "retired": false,
+        "title": "Country of Residence"
+    },
+    "patientsTelephoneNumbers": {
+        "bytes": "x00102154",
+        "vr": "SH",
+        "retired": false,
+        "title": "Patient's Telephone Numbers"
+    },
+    "ethnicGroup": {
+        "bytes": "x00102160",
+        "vr": "SH",
+        "retired": false,
+        "title": "Ethnic Group"
+    },
+    "sliceThickness": {
+        "bytes": "x00180050",
+        "vr": "DS",
+        "retired": false,
+        "title": "Slice Thickness"
+    },
+    "kvp": {
+        "bytes": "x00180060",
+        "vr": "DS",
+        "retired": false,
+        "title": "KVP"
+    },
+    "dataCollectionDiameter": {
+        "bytes": "x00180090",
+        "vr": "DS",
+        "retired": false,
+        "title": "Data Collection Diameter"
+    },
+    "deviceSerialNumber": {
+        "bytes": "x00181000",
+        "vr": "LO",
+        "retired": false,
+        "title": "Device Serial Number"
+    },
+    "softwareVersions": {
+        "bytes": "x00181020",
+        "vr": "LO",
+        "retired": false,
+        "title": "Software Version(s)"
+    },
+    "protocolName": {
+        "bytes": "x00181030",
+        "vr": "LO",
+        "retired": false,
+        "title": "Protocol Name"
+    },
+    "reconstructionDiameter": {
+        "bytes": "x00181100",
+        "vr": "DS",
+        "retired": false,
+        "title": "Reconstruction Diameter"
+    },
+    "distanceSourceToDetector": {
+        "bytes": "x00181110",
+        "vr": "DS",
+        "retired": false,
+        "title": "Distance Source to Detector"
+    },
+    "distanceSourceToPatient": {
+        "bytes": "x00181111",
+        "vr": "DS",
+        "retired": false,
+        "title": "Distance Source to Patient"
+    },
+    "gantrydetectorTilt": {
+        "bytes": "x00181120",
+        "vr": "DS",
+        "retired": false,
+        "title": "Gantry/Detector Tilt"
+    },
+    "tableHeight": {
+        "bytes": "x00181130",
+        "vr": "DS",
+        "retired": false,
+        "title": "Table Height"
+    },
+    "rotationDirection": {
+        "bytes": "x00181140",
+        "vr": "CS",
+        "retired": false,
+        "title": "Rotation Direction"
+    },
+    "exposureTime": {
+        "bytes": "x00181150",
+        "vr": "IS",
+        "retired": false,
+        "title": "Exposure Time"
+    },
+    "xRayTubeCurrent": {
+        "bytes": "x00181151",
+        "vr": "IS",
+        "retired": false,
+        "title": "X-Ray Tube Current"
+    },
+    "exposure": {
+        "bytes": "x00181152",
+        "vr": "IS",
+        "retired": false,
+        "title": "Exposure"
+    },
+    "filterType": {
+        "bytes": "x00181160",
+        "vr": "SH",
+        "retired": false,
+        "title": "Filter Type"
+    },
+    "generatorPower": {
+        "bytes": "x00181170",
+        "vr": "IS",
+        "retired": false,
+        "title": "Generator Power"
+    },
+    "focalSpots": {
+        "bytes": "x00181190",
+        "vr": "DS",
+        "retired": false,
+        "title": "Focal Spot(s)"
+    },
+    "dateOfLastCalibration": {
+        "bytes": "x00181200",
+        "vr": "DA",
+        "retired": false,
+        "title": "Date of Last Calibration"
+    },
+    "timeOfLastCalibration": {
+        "bytes": "x00181201",
+        "vr": "TM",
+        "retired": false,
+        "title": "Time of Last Calibration"
+    },
+    "convolutionKernel": {
+        "bytes": "x00181210",
+        "vr": "SH",
+        "retired": false,
+        "title": "Convolution Kernel"
+    },
+    "patientPosition": {
+        "bytes": "x00185100",
+        "vr": "CS",
+        "retired": false,
+        "title": "Patient Position"
+    },
+    "singleCollimationWidth": {
+        "bytes": "x00189306",
+        "vr": "FD",
+        "retired": false,
+        "title": "Single Collimation Width"
+    },
+    "totalCollimationWidth": {
+        "bytes": "x00189307",
+        "vr": "FD",
+        "retired": false,
+        "title": "Total Collimation Width"
+    },
+    "tableSpeed": {
+        "bytes": "x00189309",
+        "vr": "FD",
+        "retired": false,
+        "title": "Table Speed"
+    },
+    "exposureModulationType": {
+        "bytes": "x00189323",
+        "vr": "CS",
+        "retired": false,
+        "title": "Exposure Modulation Type"
+    },
+    "estimatedDoseSaving": {
+        "bytes": "x00189324",
+        "vr": "FD",
+        "retired": false,
+        "title": "Estimated Dose Saving"
+    },
+    "ctdivol": {
+        "bytes": "x00189345",
+        "vr": "FD",
+        "retired": false,
+        "title": "CTDIvol"
+    },
+    "studyId": {
+        "bytes": "x00200010",
+        "vr": "SH",
+        "retired": false,
+        "title": "Study ID"
+    },
+    "imagePositionPatient": {
+        "bytes": "x00200032",
+        "vr": "DS",
+        "retired": false,
+        "title": "Image Position (Patient)"
+    },
+    "imageOrientationPatient": {
+        "bytes": "x00200037",
+        "vr": "DS",
+        "retired": false,
+        "title": "Image Orientation (Patient)"
+    },
+    "frameOfReferenceUid": {
+        "bytes": "x00200052",
+        "vr": "UI",
+        "retired": false,
+        "title": "Frame of Reference UID"
+    },
+    "sliceLocation": {
+        "bytes": "x00201041",
+        "vr": "DS",
+        "retired": false,
+        "title": "Slice Location"
+    },
+    "windowCenter": {
+        "bytes": "x00281050",
+        "vr": "DS",
+        "retired": false,
+        "title": "Window Center"
+    },
+    "windowWidth": {
+        "bytes": "x00281051",
+        "vr": "DS",
+        "retired": false,
+        "title": "Window Width"
+    },
+    "windowCenterWidthExplanation": {
+        "bytes": "x00281055",
+        "vr": "LO",
+        "retired": false,
+        "title": "Window Center & Width Explanation"
+    },
+    "requestingPhysician": {
+        "bytes": "x00321032",
+        "vr": "PN",
+        "retired": false,
+        "title": "Requesting Physician"
+    },
+    "requestedProcedureDescription": {
+        "bytes": "x00321060",
+        "vr": "LO",
+        "retired": false,
+        "title": "Requested Procedure Description"
+    },
+    "performedProcedureStepStartDate": {
+        "bytes": "x00400244",
+        "vr": "DA",
+        "retired": false,
+        "title": "Performed Procedure Step Start Date"
+    },
+    "performedProcedureStepStartTime": {
+        "bytes": "x00400245",
+        "vr": "TM",
+        "retired": false,
+        "title": "Performed Procedure Step Start Time"
+    },
+    "performedProcedureStepId": {
+        "bytes": "x00400253",
+        "vr": "SH",
+        "retired": false,
+        "title": "Performed Procedure Step ID"
+    },
+    "performedProcedureStepDescription": {
+        "bytes": "x00400254",
+        "vr": "LO",
+        "retired": false,
+        "title": "Performed Procedure Step Description"
+    },
+    "requestedProcedurePriority": {
+        "bytes": "x00401003",
+        "vr": "SH",
+        "retired": false,
+        "title": "Requested Procedure Priority"
+    },
+    "fillerOrderNumberImagingServiceRequest": {
+        "bytes": "x00402017",
+        "vr": "LO",
+        "retired": false,
+        "title": "Filler Order Number / Imaging Service Request"
+    },
+    "tableFeedPerRotation": {
+        "bytes": "x00189310",
+        "vr": "FD",
+        "retired": false,
+        "title": "Table Feed per Rotation"
+    },
+    "spiralPitchFactor": {
+        "bytes": "x00189311",
+        "vr": "FD",
+        "retired": false,
+        "title": "Spiral Pitch Factor"
+    },
+    "imageComments": {
+        "bytes": "x00204000",
+        "vr": "LT",
+        "retired": false,
+        "title": "Image Comments"
+    },
+    "smallestImagePixelValue": {
+        "bytes": "x00280106",
+        "vr": "US or SS",
+        "retired": false,
+        "title": "Smallest Image Pixel Value"
+    },
+    "largestImagePixelValue": {
+        "bytes": "x00280107",
+        "vr": "US or SS",
+        "retired": false,
+        "title": "Largest Image Pixel Value"
+    },
+    "conversionType": {
+        "bytes": "x00080064",
+        "vr": "CS",
+        "retired": false,
+        "title": "Conversion Type"
+    },
+    "dateOfSecondaryCapture": {
+        "bytes": "x00181012",
+        "vr": "DA",
+        "retired": false,
+        "title": "Date of Secondary Capture"
+    },
+    "timeOfSecondaryCapture": {
+        "bytes": "x00181014",
+        "vr": "TM",
+        "retired": false,
+        "title": "Time of Secondary Capture"
+    },
+    "presentationIntentType": {
+        "bytes": "x00080068",
+        "vr": "CS",
+        "retired": false,
+        "title": "Presentation Intent Type"
+    },
+    "fieldOfViewShape": {
+        "bytes": "x00181147",
+        "vr": "CS",
+        "retired": false,
+        "title": "Field of View Shape"
+    },
+    "fieldOfViewDimensions": {
+        "bytes": "x00181149",
+        "vr": "IS",
+        "retired": false,
+        "title": "Field of View Dimension(s)"
+    },
+    "exposureInAs": {
+        "bytes": "x00181153",
+        "vr": "IS",
+        "retired": false,
+        "title": "Exposure in µAs"
+    },
+    "grid": {
+        "bytes": "x00181166",
+        "vr": "CS",
+        "retired": false,
+        "title": "Grid"
+    },
+    "relativeXRayExposure": {
+        "bytes": "x00181405",
+        "vr": "IS",
+        "retired": false,
+        "title": "Relative X-Ray Exposure"
+    },
+    "collimatorShape": {
+        "bytes": "x00181700",
+        "vr": "CS",
+        "retired": false,
+        "title": "Collimator Shape"
+    },
+    "verticesOfThePolygonalCollimator": {
+        "bytes": "x00181720",
+        "vr": "IS",
+        "retired": false,
+        "title": "Vertices of the Polygonal Collimator"
+    },
+    "viewPosition": {
+        "bytes": "x00185101",
+        "vr": "CS",
+        "retired": false,
+        "title": "View Position"
+    },
+    "detectorConditionsNominalFlag": {
+        "bytes": "x00187000",
+        "vr": "CS",
+        "retired": false,
+        "title": "Detector Conditions Nominal Flag"
+    },
+    "detectorTemperature": {
+        "bytes": "x00187001",
+        "vr": "DS",
+        "retired": false,
+        "title": "Detector Temperature"
+    },
+    "detectorType": {
+        "bytes": "x00187004",
+        "vr": "CS",
+        "retired": false,
+        "title": "Detector Type"
+    },
+    "detectorConfiguration": {
+        "bytes": "x00187005",
+        "vr": "CS",
+        "retired": false,
+        "title": "Detector Configuration"
+    },
+    "detectorElementPhysicalSize": {
+        "bytes": "x00187020",
+        "vr": "DS",
+        "retired": false,
+        "title": "Detector Element Physical Size"
+    },
+    "detectorElementSpacing": {
+        "bytes": "x00187022",
+        "vr": "DS",
+        "retired": false,
+        "title": "Detector Element Spacing"
+    },
+    "detectorActiveShape": {
+        "bytes": "x00187024",
+        "vr": "CS",
+        "retired": false,
+        "title": "Detector Active Shape"
+    },
+    "detectorActiveDimensions": {
+        "bytes": "x00187026",
+        "vr": "DS",
+        "retired": false,
+        "title": "Detector Active Dimension(s)"
+    },
+    "fieldOfViewOrigin": {
+        "bytes": "x00187030",
+        "vr": "DS",
+        "retired": false,
+        "title": "Field of View Origin"
+    },
+    "fieldOfViewRotation": {
+        "bytes": "x00187032",
+        "vr": "DS",
+        "retired": false,
+        "title": "Field of View Rotation"
+    },
+    "fieldOfViewHorizontalFlip": {
+        "bytes": "x00187034",
+        "vr": "CS",
+        "retired": false,
+        "title": "Field of View Horizontal Flip"
+    },
+    "filterMaterial": {
+        "bytes": "x00187050",
+        "vr": "CS",
+        "retired": false,
+        "title": "Filter Material"
+    },
+    "filterThicknessMinimum": {
+        "bytes": "x00187052",
+        "vr": "DS",
+        "retired": false,
+        "title": "Filter Thickness Minimum"
+    },
+    "filterThicknessMaximum": {
+        "bytes": "x00187054",
+        "vr": "DS",
+        "retired": false,
+        "title": "Filter Thickness Maximum"
+    },
+    "exposureControlMode": {
+        "bytes": "x00187060",
+        "vr": "CS",
+        "retired": false,
+        "title": "Exposure Control Mode"
+    },
+    "patientOrientation": {
+        "bytes": "x00200020",
+        "vr": "CS",
+        "retired": false,
+        "title": "Patient Orientation"
+    },
+    "imageLaterality": {
+        "bytes": "x00200062",
+        "vr": "CS",
+        "retired": false,
+        "title": "Image Laterality"
+    },
+    "qualityControlImage": {
+        "bytes": "x00280300",
+        "vr": "CS",
+        "retired": false,
+        "title": "Quality Control Image"
+    },
+    "burnedInAnnotation": {
+        "bytes": "x00280301",
+        "vr": "CS",
+        "retired": false,
+        "title": "Burned In Annotation"
+    },
+    "pixelIntensityRelationship": {
+        "bytes": "x00281040",
+        "vr": "CS",
+        "retired": false,
+        "title": "Pixel Intensity Relationship"
+    },
+    "pixelIntensityRelationshipSign": {
+        "bytes": "x00281041",
+        "vr": "SS",
+        "retired": false,
+        "title": "Pixel Intensity Relationship Sign"
+    },
+    "commentsOnRadiationDose": {
+        "bytes": "x00400310",
+        "vr": "ST",
+        "retired": false,
+        "title": "Comments on Radiation Dose"
+    },
+    "presentationLutShape": {
+        "bytes": "x20500020",
+        "vr": "CS",
+        "retired": false,
+        "title": "Presentation LUT Shape"
+    },
+    "targetExposureIndex": {
+        "bytes": "x00181412",
+        "vr": "DS",
+        "retired": false,
+        "title": "Target Exposure Index"
+    },
+    "detectorDescription": {
+        "bytes": "x00187006",
+        "vr": "LT",
+        "retired": false,
+        "title": "Detector Description"
+    },
+    "exposureControlModeDescription": {
+        "bytes": "x00187062",
+        "vr": "LT",
+        "retired": false,
+        "title": "Exposure Control Mode Description"
+    },
+    "exposureIndex": {
+        "bytes": "x00181411",
+        "vr": "DS",
+        "retired": false,
+        "title": "Exposure Index"
+    },
+    "deviationIndex": {
+        "bytes": "x00181413",
+        "vr": "DS",
+        "retired": false,
+        "title": "Deviation Index"
+    },
+    "exposureTimeInS": {
+        "bytes": "x00188150",
+        "vr": "DS",
+        "retired": false,
+        "title": "Exposure Time in µS"
+    },
+    "xRayTubeCurrentInA": {
+        "bytes": "x00188151",
+        "vr": "DS",
+        "retired": false,
+        "title": "X-Ray Tube Current in µA"
+    },
+    "institutionalDepartmentName": {
+        "bytes": "x00081040",
+        "vr": "LO",
+        "retired": false,
+        "title": "Institutional Department Name"
+    },
+    "numberOfStudyRelatedInstances": {
+        "bytes": "x00201208",
+        "vr": "IS",
+        "retired": false,
+        "title": "Number of Study Related Instances"
+    },
+    "pixelAspectRatio": {
+        "bytes": "x00280034",
+        "vr": "IS",
+        "retired": false,
+        "title": "Pixel Aspect Ratio"
+    },
+    "scheduledProcedureStepStartDate": {
+        "bytes": "x00400002",
+        "vr": "DA",
+        "retired": false,
+        "title": "Scheduled Procedure Step Start Date"
+    },
+    "scheduledProcedureStepStartTime": {
+        "bytes": "x00400003",
+        "vr": "TM",
+        "retired": false,
+        "title": "Scheduled Procedure Step Start Time"
+    },
+    "scheduledProcedureStepEndDate": {
+        "bytes": "x00400004",
+        "vr": "DA",
+        "retired": false,
+        "title": "Scheduled Procedure Step End Date"
+    },
+    "scheduledProcedureStepEndTime": {
+        "bytes": "x00400005",
+        "vr": "TM",
+        "retired": false,
+        "title": "Scheduled Procedure Step End Time"
+    },
+    "performedProcedureStepEndDate": {
+        "bytes": "x00400250",
+        "vr": "DA",
+        "retired": false,
+        "title": "Performed Procedure Step End Date"
+    },
+    "performedProcedureStepEndTime": {
+        "bytes": "x00400251",
+        "vr": "TM",
+        "retired": false,
+        "title": "Performed Procedure Step End Time"
+    },
+    "confidentialityCode": {
+        "bytes": "x00401008",
+        "vr": "LO",
+        "retired": false,
+        "title": "Confidentiality Code"
+    },
+    "scanOptions": {
+        "bytes": "x00180022",
+        "vr": "CS",
+        "retired": false,
+        "title": "Scan Options"
+    },
+    "nameOfPhysiciansReadingStudy": {
+        "bytes": "x00081060",
+        "vr": "PN",
+        "retired": false,
+        "title": "Name of Physician(s) Reading Study"
+    },
+    "irradiationEventUid": {
+        "bytes": "x00083010",
+        "vr": "UI",
+        "retired": false,
+        "title": "Irradiation Event UID"
+    },
+    "patientsBirthTime": {
+        "bytes": "x00100032",
+        "vr": "TM",
+        "retired": false,
+        "title": "Patient's Birth Time"
+    },
+    "exposureInMas": {
+        "bytes": "x00189332",
+        "vr": "FD",
+        "retired": false,
+        "title": "Exposure in mAs"
+    },
+    "imagesInAcquisition": {
+        "bytes": "x00201002",
+        "vr": "IS",
+        "retired": false,
+        "title": "Images in Acquisition"
+    },
+    "entranceDose": {
+        "bytes": "x00400302",
+        "vr": "US",
+        "retired": false,
+        "title": "Entrance Dose"
+    },
+    "entranceDoseInMgy": {
+        "bytes": "x00408302",
+        "vr": "DS",
+        "retired": false,
+        "title": "Entrance Dose in mGy"
+    },
+    "patientsSize": {
+        "bytes": "x00101020",
+        "vr": "DS",
+        "retired": false,
+        "title": "Patient's Size"
+    },
+    "patientsWeight": {
+        "bytes": "x00101030",
+        "vr": "DS",
+        "retired": false,
+        "title": "Patient's Weight"
+    },
+    "detectorMode": {
+        "bytes": "x00187008",
+        "vr": "LT",
+        "retired": false,
+        "title": "Detector Mode"
+    },
+    "numberOfFrames": {
+        "bytes": "x00280008",
+        "vr": "IS",
+        "retired": false,
+        "title": "Number of Frames"
+    },
+    "smallestPixelValueInSeries": {
+        "bytes": "x00280108",
+        "vr": "US or SS",
+        "retired": false,
+        "title": "Smallest Pixel Value in Series"
+    },
+    "largestPixelValueInSeries": {
+        "bytes": "x00280109",
+        "vr": "US or SS",
+        "retired": false,
+        "title": "Largest Pixel Value in Series"
+    },
+    "secondaryCaptureDeviceId": {
+        "bytes": "x00181010",
+        "vr": "LO",
+        "retired": false,
+        "title": "Secondary Capture Device ID"
+    },
+    "secondaryCaptureDeviceManufacturer": {
+        "bytes": "x00181016",
+        "vr": "LO",
+        "retired": false,
+        "title": "Secondary Capture Device Manufacturer"
+    },
+    "secondaryCaptureDeviceManufacturersModelName": {
+        "bytes": "x00181018",
+        "vr": "LO",
+        "retired": false,
+        "title": "Secondary Capture Device Manufacturer's Model Name"
+    },
+    "secondaryCaptureDeviceSoftwareVersions": {
+        "bytes": "x00181019",
+        "vr": "LO",
+        "retired": false,
+        "title": "Secondary Capture Device Software Versions"
+    },
+    "revolutionTime": {
+        "bytes": "x00189305",
+        "vr": "FD",
+        "retired": false,
+        "title": "Revolution Time"
+    },
+    "dataCollectionCenterPatient": {
+        "bytes": "x00189313",
+        "vr": "FD",
+        "retired": false,
+        "title": "Data Collection Center (Patient)"
+    },
+    "reconstructionTargetCenterPatient": {
+        "bytes": "x00189318",
+        "vr": "FD",
+        "retired": false,
+        "title": "Reconstruction Target Center (Patient)"
+    },
+    "instanceCreationDate": {
+        "bytes": "x00080012",
+        "vr": "DA",
+        "retired": false,
+        "title": "Instance Creation Date"
+    },
+    "instanceCreationTime": {
+        "bytes": "x00080013",
+        "vr": "TM",
+        "retired": false,
+        "title": "Instance Creation Time"
+    },
+    "spatialResolution": {
+        "bytes": "x00181050",
+        "vr": "DS",
+        "retired": false,
+        "title": "Spatial Resolution"
+    },
+    "planarConfiguration": {
+        "bytes": "x00280006",
+        "vr": "US",
+        "retired": false,
+        "title": "Planar Configuration"
+    },
+    "contrastbolusAgent": {
+        "bytes": "x00180010",
+        "vr": "LO",
+        "retired": false,
+        "title": "Contrast/Bolus Agent"
+    },
+    "positionReferenceIndicator": {
+        "bytes": "x00201040",
+        "vr": "LO",
+        "retired": false,
+        "title": "Position Reference Indicator"
+    },
+    "currentPatientLocation": {
+        "bytes": "x00380300",
+        "vr": "LO",
+        "retired": false,
+        "title": "Current Patient Location"
+    },
+    "requestedProcedureId": {
+        "bytes": "x00401001",
+        "vr": "SH",
+        "retired": false,
+        "title": "Requested Procedure ID"
+    },
+    "otherPatientIds": {
+        "bytes": "x00101000",
+        "vr": "LO",
+        "retired": false,
+        "title": "Other Patient IDs"
+    },
+    "spacingBetweenSlices": {
+        "bytes": "x00180088",
+        "vr": "DS",
+        "retired": false,
+        "title": "Spacing Between Slices"
+    },
+    "totalNumberOfExposures": {
+        "bytes": "x00400301",
+        "vr": "US",
+        "retired": false,
+        "title": "Total Number of Exposures"
+    },
+    "pixelPaddingValue": {
+        "bytes": "x00280120",
+        "vr": "US or SS",
+        "retired": false,
+        "title": "Pixel Padding Value"
+    },
+    "reasonForStudy": {
+        "bytes": "x00321030",
+        "vr": "LO",
+        "retired": true,
+        "title": "Reason for Study"
+    }
+}

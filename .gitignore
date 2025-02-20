@@ -32,6 +32,7 @@ yarn-debug.log*
 yarn-error.log*
 
 .eslintcache
+random_stuff/*
 
 # cypress screen shots/videos
 cypress/screenshots
