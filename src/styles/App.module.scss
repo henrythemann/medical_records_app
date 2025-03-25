@@ -230,3 +230,18 @@
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
+.thumbnailsViewerContainer {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.thumbnailsViewer {
+  height: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}

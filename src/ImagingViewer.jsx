@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as styles from './styles/App.module.scss';
 import {
   getRenderingEngine,
@@ -8,7 +8,10 @@ import {
 } from '@cornerstonejs/core';
 import {
   initDemo,
-} from '@/helpers';
+} from '/src/helpers/initDemo';
+import {
+  handleImportFiles
+} from '/src/sharedFrontendStuff';
 
 const { ViewportType } = Enums;
 const renderingEngineId = 'myRenderingEngine';
@@ -16,6 +19,7 @@ const viewportId = 'CT_STACK';
 
 export const ImagingViewer = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const divRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [menuX, setMenuX] = useState(false);
@@ -25,12 +29,38 @@ export const ImagingViewer = () => {
   const decryptionPassword = useRef(null);
   const encryptedSet = useRef(new Set());
   const [showMetadata, setShowMetadata] = useState(true);
+  const [images, setImages] = useState([]);
+  const [activeImage, setActiveImage] = useState(null);
 
   const [fullScreen, setFullScreen_] = useState(false);
   const setFullScreen = (bool) => {
     bool ? window.electronAPI.setFullScreen() : window.electronAPI.exitFullScreen();
     setFullScreen_(bool);
   };
+
+  const loadImage = async ({ image }) => {
+    setActiveImage(image);
+    const viewport = getViewport();
+    viewport.resetCamera();
+    console.log('loading', image?.filePath);
+    await viewport.setStack(['wadouri:' + image?.filePath])//URL.createObjectURL(file)])
+    // viewport.setProperties({ voiRange: { upper: 2500, lower: -1500 } });
+  }
+
+  useEffect(() => {
+      const f = async () => {
+        if (!searchParams.get('groupBy')) return;
+        const groupByField = searchParams.get('groupBy');
+        const groupByValue = searchParams.get(groupByField);
+        const result = await window.electronAPI.dbQuery({
+          query: `SELECT * FROM imaging WHERE ${groupByField} = ?`,
+          params: [groupByValue],
+        });
+        console.log('result',result);
+        setImages(result.data);
+      };
+      f();
+    }, [searchParams]);
 
   const getViewport = () => {
     const renderingEngine = getRenderingEngine(renderingEngineId);
@@ -41,7 +71,7 @@ export const ImagingViewer = () => {
     setShowEncryptionDialog(false);
     try {
       await decrypt({ fileSet: encryptedSet.current, key: decryptionPassword.current.value });
-      await handleImportFiles({ filePaths: Array.from(encryptedSet.current), firstPass: false });
+      await handleImportFiles({ filePaths: Array.from(encryptedSet.current), firstPass: false, showMessage: setModalMessage, encryptedSet: encryptedSet.current });
 
     } catch (e) {
       console.error('Error decrypting files:', e);
@@ -51,46 +81,7 @@ export const ImagingViewer = () => {
     }
   };
 
-  const handleImportFiles = async ({ filePaths, firstPass }) => {
-    setModalMessage('Finding DICOM files...');
-    setShowTooltip(false);
-    const dicomFiles = await window.electronAPI.findDicomFiles({ filePaths });
-    const thumbsPath = await window.electronAPI.getThumbsPath();
-    const dicomPath = await window.electronAPI.getDicomPath();
-    const keySet = new Set();
-    if (firstPass) {
-      encryptedSet.current = new Set();
-    }
-    for (let i = 0; i < dicomFiles.length; i++) {
-      console.log(dicomFiles[i]);
-      setModalMessage(`Importing ${i + 1} of ${dicomFiles.length}...`);
-      for (let j = 0; j < dicomFiles[i]?.metadata?.length; j++)
-        keySet.add(dicomFiles[i].metadata[j].key);
-      if (!dicomFiles[i].isEncrypted) {
-        const sopInstanceUid = dicomFiles[i].metadata.filter((m) => m.key === 'sopInstanceUid')[0].value;
-        const thumbPath = await window.electronAPI.joinPaths([thumbsPath, `${sopInstanceUid}.png`]);
-        await saveFile({ filePath: dicomFiles[i].filePath, invert: dicomFiles[i].isInverted, outputPath: thumbPath });
-        const newFilePath = await window.electronAPI.joinPaths([dicomPath, `${sopInstanceUid}.dcm`]);
-        try {
-          await window.electronAPI.copyFile({ srcPath: dicomFiles[i].filePath, destPath: newFilePath });
-        } catch (e) {
-          console.log('Copying file:', dicomFiles[i].filePath,'->', newFilePath);
-          console.error('Error copying file:', e);
-        }
-        await window.electronAPI.dbAddImage({ ...dicomFiles[i], thumbPath, filePath: newFilePath });
-      } else {
-        if (firstPass)
-          encryptedSet.current.add(dicomFiles[i].filePath);
-        else
-          console.error('Found encrypted file on second pass:', dicomFiles[i].filePath);
-      }
-    }
-    console.log(keySet);
-    setModalMessage('');
-    if (encryptedSet.current.size > 0) {
-      setShowEncryptionDialog(true);
-    }
-  };
+  
 
   const decrypt = async ({ fileSet, key }) => {
     for (const inFilePath of fileSet) {
@@ -426,11 +417,12 @@ export const ImagingViewer = () => {
                   </li>
                   <li>
                     <button onClick={async () => {
+                      setShowTooltip(false);
                       const filePaths = await window.electronAPI.openFileDialog({
                         filters: [{ name: 'All Files', extensions: ['*'] }],
                       });
                       if (!filePaths) return;
-                      await handleImportFiles({ filePaths, firstPass: true });
+                      await handleImportFiles({ filePaths, firstPass: true, showMessage: setModalMessage, encryptedSet: encryptedSet.current });
                     }}
                     >
                       import images...
@@ -473,24 +465,46 @@ export const ImagingViewer = () => {
             </div>
             </div>
             <div>
-              <p>Metadata goes here</p>
+                {activeImage && (
+                    <ul>
+                      {Object.keys(activeImage)
+                      .filter(m => m !== 'filePath' && m !== 'thumbPath' && m !== 'id' && activeImage[m] !== null)
+                      .map((m, i) => (
+                        <li key={i}>{m}: {activeImage[m]}</li>
+                      ))}
+                    </ul>
+                )}
             </div>
           </div>
         </div>
         </div>
       {!fullScreen && (
         <>
-          <p>Choose a DICOM file:</p>
-          <input
-            type="file"
-            onChange={async (e) => {
-              if (e.target.files?.length > 0) {
-                const viewport = getViewport();
-                viewport.resetCamera();
-                await viewport.setStack(['wadouri:' + URL.createObjectURL(e.target.files[0])])
-              }
-            }}
-          />
+          <section className={styles.thumbnailsViewerContainer} style={{
+            height: fullScreen ? '0' : '20vh',
+            maxHeight: fullScreen ? '0' : '20vh',
+            overflowY: 'hidden',
+          }}>
+            <div className={styles.thumbnailsViewer}>
+              {images.map((image, i) => (
+                <div
+                key={i}
+                className={styles.thumbnail}
+                onClick={() => loadImage({ image })}
+                style={{
+                  backgroundImage: `url('${image.thumbPath}')`,
+                  minWidth: '100px',
+                  // width: 'auto',
+                  height: 'calc(100% - 1rem)',
+                  aspectRatio: '1/1',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  cursor: 'pointer',
+                }}
+              />
+              ))}
+              </div>
+          </section>
         </>
       )}
     </>

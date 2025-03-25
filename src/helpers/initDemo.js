@@ -1,5 +1,5 @@
-import initProviders from './initProviders';
-import initVolumeLoader from './initVolumeLoader';
+import initProviders from './initProviders.js';
+import initVolumeLoader from './initVolumeLoader.js';
 import { init as csRenderInit } from '@cornerstonejs/core';
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import * as cornerstone from '@cornerstonejs/core';
@@ -9,7 +9,7 @@ import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
 window.cornerstone = cornerstone;
 window.cornerstoneTools = cornerstoneTools;
 
-export default async function initDemo(config) {
+export async function initDemo(config) {
   initProviders();
   cornerstoneDICOMImageLoader.init();
   initVolumeLoader();
